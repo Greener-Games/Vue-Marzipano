@@ -55,6 +55,52 @@ npm run build
 
 The optimized and minified files will be generated in the `dist/` directory.
 
+## Using in another project
+
+The `@greener-games/vue-marzipano` component is published to npm and can be used in any Vue 3 project.
+
+### Installation
+
+To install the package, run:
+
+```sh
+npm i @greener-games/vue-marzipano
+```
+
+### Usage
+
+Here is a basic example of how to use the component in a Vue file:
+
+```vue
+<template>
+  <div class="content">
+    <pano :data="data"></pano>
+  </div>
+</template>
+
+<script setup lang="ts">
+import pano from '@greener-games/vue-marzipano';
+import '@greener-games/vue-marzipano/style.css';
+import { data } from './data'; // Your data file
+</script>
+```
+
+## VueMarzipano Component
+
+The `src/VueMarzipano` directory contains the source code for the `@greener-games/vue-marzipano` npm package. This is a self-contained Vue component that wraps the Marzipano.js library.
+
+### Props
+
+The component accepts the following props:
+
+*   `data`: An object containing the scene and settings configuration.
+
+### Events
+
+The component emits the following events:
+
+*   `scene-changed`: Emitted when the scene changes. The new scene ID is passed as an argument.
+
 ## Project Structure
 
 The project is organized into two main parts: the main application and a reusable Vue component for Marzipano.
