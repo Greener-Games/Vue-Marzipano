@@ -10,6 +10,7 @@ import NavigationHotspot from "./Components/NavigationHotspot.vue";
 import SceneList from "./Components/SceneList.vue";
 import TitleBar from "./Components/TitleBar.vue";
 import VueMarzipanoButton from "./Components/VueMarzipanoButton.vue";
+import { useMarzipano } from "./composables/useMarzipano";
 
 import {findEnvVariableByKey,GetImage,generateGUID,updateHotspots} from "./helpers";
 
@@ -26,6 +27,7 @@ export {
     SceneList,
     TitleBar,
     VueMarzipanoButton,
+    useMarzipano,
 };
 
 export {VueMarzipano, findEnvVariableByKey,GetImage,generateGUID,updateHotspots}
