@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import {computed, defineAsyncComponent, defineProps, resolveComponent} from 'vue';
-import NavigationHotspot from "./NavigationHotspot.vue";
+import NavigationHotspot from "./Hotspots/NavigationHotspot.vue";
 
 const props = defineProps({
   hotspotInfo: Object,
@@ -23,8 +23,9 @@ const hotspotType = computed(() => {
 
         // If resolveComponent doesn't return a valid component, use defineAsyncComponent
         if (component === null || component === undefined || typeof component === 'string') {
+          // Import from the Hotspots subdirectory to avoid Vite warning about importing from own directory
           component = defineAsyncComponent({
-            loader: () => import(`./${type}.vue`),
+            loader: () => import(`./Hotspots/${type}.vue`),
             loadingComponent: NavigationHotspot,
             errorComponent: NavigationHotspot,
           })
