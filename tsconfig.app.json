@@ -11,8 +11,7 @@
     "noUncheckedSideEffectImports": true
   },
   "paths": {
-    "@/*": ["./src/*"],
-    "@VueMarzipano/*": ["./plugins/VueMarzipano/src/*"]
+    "@/*": ["./src/*"]
   },
   "include": [
     "src/**/*.ts",

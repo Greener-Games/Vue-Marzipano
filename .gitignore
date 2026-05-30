@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/dist
+**/dist
 
 # local env files
 .env.local
@@ -30,4 +30,3 @@ storybook-static
 Package/template
 Package/node_modules
 .sharepoint/private.json
-src/VueMarzipano/dist

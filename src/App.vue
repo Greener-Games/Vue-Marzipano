@@ -1,55 +1,49 @@
 <template>
-  <div class="content">
-    <pano ref="marzipanoViewer" v-if="fetchedData" :data="fetchedData">
-    </pano>
+  <div class="app-container">
+    <header class="app-header">
+      <nav>
+        <router-link to="/">Home</router-link> |
+        <router-link to="/docs">Documentation</router-link> |
+        <router-link to="/examples">Examples</router-link>
+      </nav>
+    </header>
+    <main class="app-main">
+      <router-view></router-view>
+    </main>
   </div>
-
-  <button class="new-toggle" @click="toggleAutoRotate">Toggle Auto Rotate</button>
-
 </template>
 
 <script setup lang="ts">
-import pano from '@VueMarzipano/Views/MarzipanoViewer.vue'
-import {onMounted, ref} from "vue";
-import {data as localData} from '@/data/data';
-import {findEnvVariableByKey} from "@VueMarzipano/helpers.ts";
-
-const marzipanoViewer = ref(null);
-const fetchedData = ref(null);
-
-onMounted(async () => {
-  if (localData?.cloud?.enabled) {
-    try {
-      const url = `${localData.cloud.url}/data.js?${findEnvVariableByKey(localData.cloud.key)}`;
-      const response = await import(url);
-      fetchedData.value = {...response.data, cloud: localData.cloud};
-    } catch (error) {
-      console.error('Failed to fetch data from cloud:', error);
-      fetchedData.value = localData;
-    }
-  } else {
-    fetchedData.value = localData;
-  }
-});
-
-function toggleAutoRotate() {
-  if (marzipanoViewer.value) {
-    marzipanoViewer.value.enableAutoRotate = !marzipanoViewer.value.enableAutoRotate;
-  }
-}
-
 </script>
 
 <style scoped>
-
-.content {
-  width: 100%;
-  height: 100%;
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
 }
 
-.new-toggle
-{
-  position: absolute;
-  top:50%
+.app-header {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+nav a.router-link-exact-active {
+  color: #42b983;
+}
+
+.app-main {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 </style>

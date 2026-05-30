@@ -1,0 +1,42 @@
+{
+  "name": "@greener-games/vue-marzipano",
+  "type": "module",
+  "private": false,
+  "version": "0.0.1",
+  "main": "dist/vue-marzipano.umd.js",
+  "module": "dist/vue-marzipano.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-marzipano.es.js",
+      "require": "./dist/vue-marzipano.js"
+    },
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "dependencies": {
+    "marzipano": "^0.10.2",
+    "sass": "^1.62.1",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "path": "^0.12.7",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vite-plugin-dts": "^5.0.1",
+    "vue-tsc": "^1.4.2"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}
