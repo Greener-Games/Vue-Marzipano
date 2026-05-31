@@ -4,6 +4,7 @@
     <ul>
       <li><router-link to="/examples/basic">Basic Viewer</router-link></li>
       <li><router-link to="/examples/multiple">Multiple Viewers</router-link></li>
+      <li><router-link to="/examples/hotspots">Custom Hotspots</router-link></li>
     </ul>
   </div>
 </template>
