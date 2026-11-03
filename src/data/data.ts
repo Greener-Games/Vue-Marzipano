@@ -2,11 +2,6 @@ import type { MarzipanoData } from '@greener-games/vue-marzipano';
 
 export const data: MarzipanoData = {
   name: 'Project Title',
-  cloud: {
-    enabled: false,
-    url: 'https://360imagegallery.file.core.windows.net/tiles/neom',
-    key: 'VITE_APP_CLOUD_KEY',
-  },
   scenes: [
     {
       id: '0-image1',
@@ -82,8 +77,6 @@ export const data: MarzipanoData = {
   settings: {
     mouseViewMode: 'drag',
     autorotateEnabled: true,
-    fullscreenButton: true,
-    viewControlButtons: true,
     navigationButtons: [
       {
         type: 'AutoRotateButton',
@@ -100,6 +93,6 @@ export const data: MarzipanoData = {
     ],
   },
   icons: {
-    defaultNavigationIcon: '/assets/img/link.png',
+    defaultNavigationIcon: 'assets/img/link.png',
   },
 };
