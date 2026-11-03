@@ -1,4 +1,5 @@
-import { ref, shallowRef, nextTick } from 'vue';
+import { inject, ref, shallowRef, nextTick } from 'vue';
+import type { InjectionKey } from 'vue';
 import { Marzipano } from '../marzipano';
 import { findEnvVariableByKey, updateHotspots } from '../helpers';
 import { pluginOptions, setPluginOptions } from '../pluginOptions';
@@ -12,22 +13,38 @@ import type {
   VueMarzipanoOptions,
 } from '../types';
 
-// Shared state (Singleton pattern). Marzipano's own objects are held in shallow refs so Vue
-// doesn't wrap them in reactive proxies, which breaks Marzipano's identity checks.
-const panoElement = ref<HTMLElement | null>(null);
-const viewer = shallowRef<MarzipanoViewerHandle | null>(null);
-const scenes = shallowRef<ViewerScene[]>([]);
-const currentScene = shallowRef<ViewerScene | null>(null);
-const allHotspots = ref<RenderedHotspot[]>([]);
-const enableAutoRotate = ref(false);
-const autorotateSettings = Marzipano.autorotate({
-  yawSpeed: 0.03,
-  targetPitch: 0,
-  targetFov: Math.PI / 2,
-});
+export type MarzipanoController = ReturnType<typeof createMarzipano>;
 
-/** Creates and drives a Marzipano viewer: scenes, hotspots, scene switching and camera moves. */
-export function useMarzipano() {
+export const marzipanoKey: InjectionKey<MarzipanoController> = Symbol('vue-marzipano');
+
+/** Returns the controls of the nearest <MarzipanoViewer>, for components rendered inside it. */
+export function useMarzipano(): MarzipanoController {
+  const controller = inject(marzipanoKey, null);
+  if (!controller) {
+    throw new Error(
+      '[vue-marzipano] useMarzipano() must be called inside <MarzipanoViewer>. ' +
+        'From outside, use a template ref on the viewer instead.',
+    );
+  }
+  return controller;
+}
+
+/** Creates the state and controls for one viewer: scenes, hotspots, scene switching, camera. */
+export function createMarzipano() {
+  // Each viewer gets its own state. Marzipano's own objects are held in shallow refs so Vue
+  // doesn't wrap them in reactive proxies, which breaks Marzipano's identity checks.
+  const panoElement = ref<HTMLElement | null>(null);
+  const viewer = shallowRef<MarzipanoViewerHandle | null>(null);
+  const scenes = shallowRef<ViewerScene[]>([]);
+  const currentScene = shallowRef<ViewerScene | null>(null);
+  const allHotspots = ref<RenderedHotspot[]>([]);
+  const enableAutoRotate = ref(false);
+  const autorotateSettings = Marzipano.autorotate({
+    yawSpeed: 0.03,
+    targetPitch: 0,
+    targetFov: Math.PI / 2,
+  });
+
   /**
    * Initialize the Marzipano viewer
    * @param element The HTML element to mount the viewer on
@@ -107,7 +124,10 @@ export function useMarzipano() {
 
       void nextTick(() => {
         sceneHotspots.forEach((x) => {
-          const el = document.getElementById(String(x.id));
+          // Look inside this viewer only: two viewers on a page can share hotspot ids
+          const el = element.querySelector<HTMLElement>(
+            `[data-hotspot-id="${CSS.escape(String(x.id))}"]`,
+          );
           if (el) {
             createdScene.hotspotContainer().createHotspot(el, { yaw: x.yaw, pitch: x.pitch });
           }

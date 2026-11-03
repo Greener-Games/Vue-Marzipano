@@ -10,7 +10,7 @@ import NavigationHotspot from './Components/Hotspots/NavigationHotspot.vue';
 import SceneList from './Components/SceneList.vue';
 import TitleBar from './Components/TitleBar.vue';
 import VueMarzipanoButton from './Components/VueMarzipanoButton.vue';
-import { useMarzipano } from './composables/useMarzipano';
+import { createMarzipano, useMarzipano } from './composables/useMarzipano';
 import { useMarzipanoContext } from './context';
 
 import { findEnvVariableByKey, GetImage, generateGUID, updateHotspots } from './helpers';
@@ -28,6 +28,7 @@ export {
   SceneList,
   TitleBar,
   VueMarzipanoButton,
+  createMarzipano,
   useMarzipano,
   useMarzipanoContext,
 };
@@ -35,4 +36,5 @@ export {
 export { VueMarzipano, findEnvVariableByKey, GetImage, generateGUID, updateHotspots };
 
 export type { MarzipanoContext, MarzipanoViewFunctions } from './context';
+export type { MarzipanoController } from './composables/useMarzipano';
 export type * from './types';

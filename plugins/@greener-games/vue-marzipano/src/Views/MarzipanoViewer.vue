@@ -3,12 +3,7 @@
     <slot name="titleBar">
       <TitleBar />
     </slot>
-    <MarzipanoHotspot
-      v-for="hotspot in allHotspots"
-      :id="hotspot.id"
-      :key="hotspot.id"
-      :hotspot-info="hotspot"
-    />
+    <MarzipanoHotspot v-for="hotspot in allHotspots" :key="hotspot.id" :hotspot-info="hotspot" />
     <slot name="contentButtons">
       <div class="control-buttons">
         <div class="button-layout" style="gap: 1rem">
@@ -28,12 +23,12 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted } from 'vue';
+  import { computed, onMounted, onUnmounted, provide } from 'vue';
   import SceneList from '../Components/SceneList.vue';
   import TitleBar from '../Components/TitleBar.vue';
   import MarzipanoHotspot from '../Components/MarzipanoHotspot.vue';
   import VueMarzipanoButton from '../Components/VueMarzipanoButton.vue';
-  import { useMarzipano } from '../composables/useMarzipano';
+  import { createMarzipano, marzipanoKey } from '../composables/useMarzipano';
   import { provideMarzipanoContext } from '../context';
   import type { MarzipanoData } from '../types';
 
@@ -41,6 +36,8 @@
     data: MarzipanoData;
   }>();
 
+  // This viewer's own state, so several viewers can share a page
+  const controller = createMarzipano();
   const {
     panoElement,
     viewer,
@@ -54,8 +51,11 @@
     findSceneById,
     findSceneDataById,
     destroyMarzipano,
-  } = useMarzipano();
+    lookTo,
+    setFov,
+  } = controller;
 
+  provide(marzipanoKey, controller);
   provideMarzipanoContext({
     scenes,
     viewer,
@@ -67,7 +67,16 @@
     viewFunctions: { switchScene, findSceneById, findSceneDataById },
   });
 
-  defineExpose({ enableAutoRotate, switchScene, findSceneById, findSceneDataById });
+  defineExpose({
+    enableAutoRotate,
+    currentScene,
+    scenes,
+    switchScene,
+    findSceneById,
+    findSceneDataById,
+    lookTo,
+    setFov,
+  });
 
   const navigationButtons = computed(() => props.data.settings.navigationButtons);
 

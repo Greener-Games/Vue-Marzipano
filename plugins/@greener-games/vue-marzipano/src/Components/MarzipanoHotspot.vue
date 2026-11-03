@@ -1,5 +1,5 @@
 <template>
-  <div :id="String(hotspotInfo.id)">
+  <div :data-hotspot-id="String(hotspotInfo.id)">
     <component :is="hotspotType" :hotspot="hotspotInfo" />
   </div>
 </template>
