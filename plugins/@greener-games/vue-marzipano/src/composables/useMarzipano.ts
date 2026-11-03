@@ -1,7 +1,7 @@
 import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import type { InjectionKey } from 'vue';
 import { Marzipano } from '../marzipano';
-import { resolveTilesUrl, withIds } from '../helpers';
+import { resolveTileSource, withIds } from '../helpers';
 import { pluginOptions } from '../pluginOptions';
 import type {
   MarzipanoData,
@@ -91,8 +91,7 @@ export function createMarzipano() {
       ...viewerOptions,
     });
 
-    const tilesUrl = resolveTilesUrl(tour.tiles?.url);
-    const query = tour.tiles?.query ? `?${tour.tiles.query.replace(/^\?/, '')}` : '';
+    const { url: tilesUrl, query } = resolveTileSource(tour.tiles);
     const pending: (PlacedHotspot & { scene: MarzipanoSceneHandle })[] = [];
 
     scenes.value = tour.scenes.map((source) => {

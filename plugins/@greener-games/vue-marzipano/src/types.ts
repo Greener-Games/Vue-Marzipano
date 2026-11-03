@@ -2,7 +2,10 @@
 
 /** Where scene tiles load from. */
 export interface TileSource {
-  /** Folder holding one tile folder per scene id. Defaults to `tiles` under the plugin's `baseUrl`. */
+  /**
+   * Folder holding one tile folder per scene id, at any depth, e.g. `https://…/tiles/my-tour`.
+   * A query string in it (a pasted SAS URL) is kept. Defaults to `tiles` under `baseUrl`.
+   */
   url?: string;
   /**
    * Query string added to every tile request, e.g. a SAS token for Azure storage. It is sent to
@@ -72,6 +75,8 @@ export interface NavigationButton {
   zoomFactor?: number;
   xFactor?: number;
   yFactor?: number;
+  /** Extra fields are passed through to custom button components. */
+  [key: string]: unknown;
 }
 
 export interface MarzipanoSettings {

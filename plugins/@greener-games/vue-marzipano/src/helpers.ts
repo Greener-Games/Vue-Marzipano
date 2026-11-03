@@ -1,7 +1,7 @@
 import { resolveComponent } from 'vue';
 import type { Component } from 'vue';
 import { pluginOptions } from './pluginOptions';
-import type { HotspotBase } from './types';
+import type { HotspotBase, TileSource } from './types';
 
 /** Returns copies of the hotspots with an id on each; hotspots without one get `<prefix>-<index>`. */
 export function withIds<T extends HotspotBase>(hotspots: T[] | undefined, prefix: string) {
@@ -23,9 +23,19 @@ export function resolveImageUrl(imagePath: string | undefined) {
   return new URL(imagePath, baseUrl()).toString();
 }
 
-/** Resolves the folder that holds each scene's tile folder, without a trailing slash. */
-export function resolveTilesUrl(url: string | undefined) {
-  return new URL(url ?? 'tiles', baseUrl()).toString().replace(/\/$/, '');
+/** Resolves where a tour's tiles load from: the folder URL (no trailing slash) and the query string. */
+export function resolveTileSource(tiles: TileSource | undefined) {
+  const url = new URL(tiles?.url ?? 'tiles', baseUrl());
+  // A query string inside the URL itself, e.g. a pasted SAS URL, goes on every request too
+  const queries = [url.search, tiles?.query ?? '']
+    .map((query) => query.replace(/^\?/, ''))
+    .filter(Boolean);
+  url.search = '';
+  url.hash = '';
+  return {
+    url: url.toString().replace(/\/$/, ''),
+    query: queries.length ? `?${queries.join('&')}` : '',
+  };
 }
 
 /** Finds the component a hotspot or button `type` names: a built-in one, or one the app registered. */
