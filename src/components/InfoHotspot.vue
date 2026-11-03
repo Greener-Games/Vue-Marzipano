@@ -1,7 +1,7 @@
 <template>
   <div class="info-hotspot">
     <h3>{{ hotspot.title }}</h3>
-    <p>{{ hotspot.description }}</p>
+    <p>{{ hotspot.text }}</p>
   </div>
 </template>
 
@@ -15,6 +15,9 @@
 
 <style scoped>
   .info-hotspot {
+    width: 16rem;
+    max-height: 12rem;
+    overflow-y: auto;
     background-color: rgb(255 255 255 / 80%);
     padding: 10px;
     border-radius: 5px;

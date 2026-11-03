@@ -18,11 +18,10 @@ export const updateHotspots = <T extends HotspotBase>(hotspots: T[]) => {
   }));
 };
 
-/** Resolves an image path from the scene data to a URL. */
+/** Resolves an image path from the scene data to a URL; relative paths resolve from the site root. */
 export function GetImage(imagePath: string | undefined) {
   if (!imagePath) return '';
-  const basePath = window.location.hostname === 'localhost' ? '/src/' : '/';
-  return new URL(`${basePath}${imagePath}`, window.location.origin).toString();
+  return new URL(imagePath, `${window.location.origin}/`).toString();
 }
 
 /** Looks up a value in the env the host app passed to app.use(VueMarzipano, { env }). */

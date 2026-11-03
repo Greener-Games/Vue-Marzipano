@@ -1,6 +1,6 @@
 <template>
   <div class="title-bar">
-    <h1 class="scene-name">{{ sanitize(currentScene?.data.name) }}</h1>
+    <h1 class="scene-name">{{ currentScene?.data.name }}</h1>
   </div>
 </template>
 
@@ -8,17 +8,9 @@
   import { useMarzipanoContext } from '../context';
 
   const { currentScene } = useMarzipanoContext();
-
-  function sanitize(s: string | undefined) {
-    return s?.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
-  }
 </script>
 
 <style>
-  h1 {
-    font-size: 24px !important;
-  }
-
   .title-bar {
     z-index: 10;
     position: absolute;
@@ -33,6 +25,8 @@
   }
 
   .scene-name {
+    margin: 0;
+    font-size: 24px;
     color: white;
   }
 </style>

@@ -98,7 +98,7 @@ export const data: MarzipanoData = {
         imageOn: 'assets/img/play.png',
         imageOff: 'assets/img/pause.png',
       },
-      { type: 'FullScreenButton', imageName: 'assets/img/fullscreen.png' },
+      { type: 'FullscreenButton', imageName: 'assets/img/fullscreen.png' },
       { type: 'NavigateButton', zoomFactor: 0.8, imageName: 'assets/img/plus.png' },
       { type: 'NavigateButton', zoomFactor: 1.2, imageName: 'assets/img/minus.png' },
       { type: 'NavigateButton', xFactor: -10, imageName: 'assets/img/left.png' },
