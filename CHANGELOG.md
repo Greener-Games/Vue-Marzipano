@@ -2,14 +2,14 @@
 
 ### Bug Fixes
 
-- give each MarzipanoViewer its own state so several can share a page ([59a9c32](https://github.com/Greener-Games/Vue-Marzipano/commit/59a9c32d93ac4daa2b0d5db3012549af92c2027c))
-- image paths, title bar escaping and demo hotspot data ([61d11f2](https://github.com/Greener-Games/Vue-Marzipano/commit/61d11f2ca1cdfda957a2da473dc10ba8e2b78132))
-- keep a tile url's query string and pass extra button fields through ([8145da0](https://github.com/Greener-Games/Vue-Marzipano/commit/8145da04e88c875d3f698ca8c1f735155bf5b5dd))
+- give each MarzipanoViewer its own state so several can share a page ([8c9e42e](https://github.com/Greener-Games/Vue-Marzipano/commit/8c9e42ec19494931f87194d01e40ba404f70681d))
+- image paths, title bar escaping and demo hotspot data ([e20a694](https://github.com/Greener-Games/Vue-Marzipano/commit/e20a694018f95e14b9d056ed97607f65ca81d704))
+- keep a tile url's query string and pass extra button fields through ([8a79334](https://github.com/Greener-Games/Vue-Marzipano/commit/8a79334b09cec13641a3c2b1624bd3809d45a7d1))
 
 ### Features
 
-- add custom hotspot example ([6bd0edb](https://github.com/Greener-Games/Vue-Marzipano/commit/6bd0edbe26b9ad50b6e4c8eb92d52f07fb69ee72))
-- settle the plugin api for 1.0 ([bdc0a86](https://github.com/Greener-Games/Vue-Marzipano/commit/bdc0a86e3280c6c07f6b105ef9925654db560b2e))
+- add custom hotspot example ([3dd9955](https://github.com/Greener-Games/Vue-Marzipano/commit/3dd9955ab7ebb5b9f2f057645a791a70b192935d))
+- settle the plugin api for 1.0 ([add143c](https://github.com/Greener-Games/Vue-Marzipano/commit/add143cca9d4545f68a19a5e6b22643ecda3a97c))
 
 ### BREAKING CHANGES
 
