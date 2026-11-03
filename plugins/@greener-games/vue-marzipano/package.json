@@ -1,6 +1,6 @@
 {
   "name": "@greener-games/vue-marzipano",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Vue 3 wrapper for the Marzipano 360° panorama viewer, with scenes, hotspots and controls driven by a data object",
   "author": "",
   "license": "MIT",
