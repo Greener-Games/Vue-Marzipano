@@ -21,5 +21,3 @@
   global components, and the unused `fullscreenButton` and
   `viewControlButtons` settings are removed. See the plugin README's
   "Migrating from 0.x".
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
