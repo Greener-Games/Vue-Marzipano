@@ -4,9 +4,7 @@
 
     <section>
       <h2>Installation</h2>
-      <p>
-        Install the plugin via npm or yarn once it's published, or use it locally via workspaces.
-      </p>
+      <p>Install the plugin from npm. It needs Vue 3.</p>
       <pre><code>npm install @greener-games/vue-marzipano</code></pre>
     </section>
 
@@ -19,9 +17,13 @@ import VueMarzipano from '@greener-games/vue-marzipano'
 import '@greener-games/vue-marzipano/style.css'
 
 const app = createApp(App)
-app.use(VueMarzipano)
+app.use(VueMarzipano, { env: import.meta.env })
 app.mount('#app')
 </code></pre>
+      <p>
+        Passing <code>env</code> is only needed when your scene data loads tiles from the cloud: the
+        plugin reads the key named in <code>cloud.key</code> from it.
+      </p>
     </section>
 
     <section>

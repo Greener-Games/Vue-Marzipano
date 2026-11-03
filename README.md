@@ -1,72 +1,47 @@
-# Marzipano Vue Viewer
+# Vue Marzipano
 
-This project provides a robust, reusable Vue 3 wrapper for the [Marzipano.js](https://www.marzipano.net/) 360-degree media viewer. It is organized as an npm workspace monorepo, where the core plugin resides in a workspace package and the root application acts as a documentation and example hub designed to be deployed to GitHub Pages.
+Source for [`@greener-games/vue-marzipano`](plugins/@greener-games/vue-marzipano/README.md), a Vue 3 wrapper for the [Marzipano](https://www.marzipano.net/) 360° panorama viewer, plus a demo site with docs and examples that runs against the plugin's source.
 
-## Features
+Created with cd-web-new-project v0.1.0 from Vue_Template_Project@4cdae41 on 2026-11-03.
 
-- **360-Degree Image Viewing:** Smooth and interactive panoramic image viewing.
-- **Hotspot Navigation:** Link between different scenes using configurable hotspots.
-- **Informational Hotspots:** Display text, titles, and custom components for points of interest.
-- **Auto-Rotation:** Automatically rotate the view for a cinematic experience.
-- **Configurable Data Source:** Load scene data from a local JavaScript configuration file or remote cloud sources.
-- **Customizable UI:** Control the visibility and styles of UI elements like fullscreen and navigation buttons out-of-the-box.
+## Layout
 
-## Project Structure
+This is an npm workspace, set up from the team's Vue template as a plugin project.
 
-The project is structured as an npm workspace monorepo:
+- `plugins/@greener-games/vue-marzipano/`: the published package. See its [README](plugins/@greener-games/vue-marzipano/README.md) for how to use it.
+  - `src/Views/MarzipanoViewer.vue`: the viewer component.
+  - `src/composables/useMarzipano.ts`: per-viewer state and controls.
+  - `src/types.ts`: the scene data format and the Marzipano API types.
+- `src/`: the demo site (Vue Router, Tailwind). It imports the plugin from source via a Vite alias, so plugin edits hot-reload.
+  - `src/views/examples/`: basic viewer, multiple viewers, custom hotspots, slot overrides, custom viewpoints.
+  - `src/data/`: the demo tour data.
+- `public/tiles/`: demo panorama tiles. `public/assets/img/`: demo control icons.
 
-- `src/`: The main application directory, powered by Vite and Vue Router. This acts as the documentation site and example playground.
-  - `src/views/`: Contains the main layout views (Home, Documentation, Examples).
-  - `src/views/examples/`: Contains specific usage examples (e.g., Basic Viewer, Multiple Viewers) that demonstrate how to implement the plugin.
-- `plugins/@greener-games/vue-marzipano/`: The dedicated workspace package containing the actual Vue 3 plugin. This is what you would build and publish to a registry.
-  - `src/Views/MarzipanoViewer.vue`: The core, reusable viewer component.
-  - `src/composables/useMarzipano.ts`: The core composable managing state.
+## Develop
 
-## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [npm](https://www.npmjs.com/)
-
-### Installation
-
-1.  Clone the repository:
-    ```sh
-    git clone https://github.com/Greener-Games/marzipano-vue-viewer.git
-    ```
-2.  Navigate to the project directory:
-    ```sh
-    cd marzipano-vue-viewer
-    ```
-3.  Install all dependencies (this automatically links the workspace packages):
-    ```sh
-    npm install
-    ```
-
-## Development
-
-To start the documentation and example site locally (which dynamically consumes the local plugin):
+Needs Node 20+ and npm 10+.
 
 ```sh
+npm install
 npm run dev
 ```
 
-Visit the local URL (usually `http://localhost:5173`) to view the documentation, explore examples, and see the plugin in action.
+The dev server runs on a fixed port per project name: http://localhost:17688.
 
-## Building
+| Script                 | Does                                                              |
+| ---------------------- | ----------------------------------------------------------------- |
+| `npm run dev`          | Demo site with hot reload                                         |
+| `npm run build`        | Builds the plugin (`plugins/…/dist`), then the demo site (`dist`) |
+| `npm run lint`         | ESLint, Stylelint, Prettier and vue-tsc                           |
+| `npm run lint:fix`     | Auto-fixes what it can                                            |
+| `npm run health-check` | Writes `health-report.md`; CI fails below grade C                 |
 
-The project uses npm workspaces to build both the plugin library and the documentation app.
+Commits must follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`…). Husky runs lint-staged and commitlint on each commit.
 
-```sh
-npm run build
-```
+## Release
 
-This command will:
+Releases are automated by `.github/workflows/ci-cd.yml` and semantic-release. See [`.supporting_docs/RELEASE_PROCESS.md`](.supporting_docs/RELEASE_PROCESS.md).
 
-1. Build the `@greener-games/vue-marzipano` plugin (generating `dist/` inside the plugin folder with TypeScript declarations and compiled output).
-2. Build the main application (generating `dist/` in the root folder, ready for deployment to GitHub Pages).
-
-## Configuration
-
-Configuration for the examples (scenes, hotspots, button visibility) is driven by standard JSON/JS objects. For the main examples, data is loaded from `src/data/data.js`. The plugin expects a `data` prop conforming to the `MarzipanoData` interface defined in `plugins/@greener-games/vue-marzipano/src/types.ts`.
+- Pushes and pull requests to `develop` and `master` run the build and health check.
+- A push to `master` that passes runs semantic-release. It works out the version from the commits, tags it, updates `CHANGELOG.md`, and publishes the plugin to npm.
+- Publishing needs an `NPM_TOKEN` repository secret with publish rights to the `@greener-games` scope.
