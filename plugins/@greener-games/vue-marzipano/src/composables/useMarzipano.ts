@@ -1,6 +1,7 @@
 import Marzipano from "marzipano";
-import { ref, nextTick, reactive } from "vue";
+import { ref, nextTick } from "vue";
 import { findEnvVariableByKey, updateHotspots } from "../helpers";
+import { pluginOptions, setPluginOptions } from "../pluginOptions";
 import type { MarzipanoData, SceneData, ViewParameters } from "../types";
 
 // Shared state (Singleton pattern)
@@ -16,9 +17,6 @@ const autorotateSettings = Marzipano.autorotate({
     targetFov: Math.PI / 2
 });
 
-// Global plugin options
-const pluginOptions = reactive<any>({});
-
 export function useMarzipano() {
 
     /**
@@ -30,8 +28,8 @@ export function useMarzipano() {
     function initMarzipano(element: HTMLElement, data: MarzipanoData, options: any = {}) {
         panoElement.value = element;
 
-        // Merge global options with local options
-        const config = { ...pluginOptions, ...options };
+        // Merge global options with local options (env is for helpers, not the Marzipano viewer)
+        const { env: _env, ...config } = { ...pluginOptions, ...options };
 
         // Initialize auto rotate setting from data if available
         if (data.settings && data.settings.autorotateEnabled !== undefined) {
@@ -108,9 +106,9 @@ export function useMarzipano() {
         }
     }
 
-    function switchScene(scene: any) {
+    function switchScene(scene: any, params?: ViewParameters) {
         if (!scene) return;
-        scene.view.setParameters(scene.data.initialViewParameters);
+        scene.view.setParameters(params || scene.data.initialViewParameters);
         scene.scene.switchTo();
         currentScene.value = scene;
     }
@@ -157,10 +155,6 @@ export function useMarzipano() {
             params.fov = fov;
             currentScene.value.view.setParameters(params);
         }
-    }
-
-    function setPluginOptions(options: any) {
-        Object.assign(pluginOptions, options);
     }
 
     return {

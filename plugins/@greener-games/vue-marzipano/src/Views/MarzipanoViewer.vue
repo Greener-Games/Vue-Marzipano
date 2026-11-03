@@ -3,8 +3,7 @@
     <slot name="titleBar">
       <TitleBar/>
     </slot>
-    <Hotspot v-for="hotspot in allHotspots" :key="hotspot.id" :id="hotspot.id" :hotspotInfo="hotspot"
-             @click="switchScene(findSceneById(hotspot.target))"/>
+    <Hotspot v-for="hotspot in allHotspots" :key="hotspot.id" :id="hotspot.id" :hotspotInfo="hotspot"/>
     <slot name="contentButtons">
       <div class="control-buttons">
         <div class="button-layout" style="gap: 1rem">
@@ -57,7 +56,7 @@ provide("currentScene", currentScene);
 provide("panoElement", panoElement);
 provide("enableAutoRotate", enableAutoRotate);
 provide("autorotateSettings", autorotateSettings);
-provide("marzipanoViewFunctions", {switchScene});
+provide("marzipanoViewFunctions", {switchScene, findSceneById, findSceneDataById});
 
 defineExpose({enableAutoRotate, switchScene, findSceneById, findSceneDataById});
 

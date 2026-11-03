@@ -15,24 +15,16 @@ const props = defineProps({
   }
 });
 
-const scenes: any = inject('scenes')
 const marzipanoViewFunctions = inject('marzipanoViewFunctions') // Inject the switchScene function
-
 const data = inject('data')
+
 const imageSrc = computed(() => props.hotspot?.imageOverride ? GetImage(props.hotspot?.imageOverride) : GetImage(data?.icons?.defaultNavigationIcon))
 
 // Switch to the selected scene
 function TriggerSceneSwitch() {
-  marzipanoViewFunctions.switchScene(findSceneById(props.hotspot.target));
-}
-
-function findSceneById() {
-  for (let i = 0; i < scenes.value.length; i++) {
-    if (scenes.value[i].data.id === props.hotspot.target) {
-      return scenes.value[i]
-    }
-  }
-  return null
+  const scene = marzipanoViewFunctions.findSceneById(props.hotspot.target);
+  if (!scene) return;
+  marzipanoViewFunctions.switchScene(scene, scene.data.navigationViewParameters || scene.data.initialViewParameters);
 }
 </script>
 

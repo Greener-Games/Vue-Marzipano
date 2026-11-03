@@ -14,5 +14,7 @@ const app = createApp(App)
 app.use(router)
 app.component('InfoHotspot', InfoHotspot);
 app.component('CustomImageHotspot', CustomImageHotspot);
-app.use(VueMarzipano)
+app.use(VueMarzipano, {
+    env: import.meta.env
+});
 app.mount('#app')

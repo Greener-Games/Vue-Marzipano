@@ -1,3 +1,5 @@
+import {pluginOptions} from "./pluginOptions";
+
 export function generateGUID() {
     return 'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,
@@ -20,9 +22,11 @@ export function GetImage(imagePath : string)
 }
 
 export function findEnvVariableByKey(key) {
+    // The host app passes its env via app.use(VueMarzipano, { env: import.meta.env })
+    const env = pluginOptions.env;
     // Check if the key exists in the environment variables
-    if (import.meta.env.hasOwnProperty(key)) {
-        return import.meta.env[key];
+    if (env?.hasOwnProperty(key)) {
+        return env[key];
     } else {
         console.log(`No environment variable found with the key: ${key}`);
         return null;
