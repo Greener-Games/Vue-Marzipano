@@ -1,36 +1,48 @@
+import { resolveComponent } from 'vue';
+import type { Component } from 'vue';
 import { pluginOptions } from './pluginOptions';
 import type { HotspotBase } from './types';
 
-/** Generates a short random id for hotspots that don't define one. */
-export function generateGUID() {
-  return 'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0,
-      v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
-/** Returns the hotspots with an id on each, so they can be matched to their rendered element. */
-export const updateHotspots = <T extends HotspotBase>(hotspots: T[]) => {
-  return hotspots.map((c) => ({
-    ...c,
-    id: c?.id || generateGUID(),
+/** Returns copies of the hotspots with an id on each; hotspots without one get `<prefix>-<index>`. */
+export function withIds<T extends HotspotBase>(hotspots: T[] | undefined, prefix: string) {
+  return (hotspots ?? []).map((hotspot, index) => ({
+    ...hotspot,
+    id: hotspot.id ?? `${prefix}-${index}`,
   }));
-};
-
-/** Resolves an image path from the scene data to a URL; relative paths resolve from the site root. */
-export function GetImage(imagePath: string | undefined) {
-  if (!imagePath) return '';
-  return new URL(imagePath, `${window.location.origin}/`).toString();
 }
 
-/** Looks up a value in the env the host app passed to app.use(VueMarzipano, { env }). */
-export function findEnvVariableByKey(key: string): string | null {
-  const env = pluginOptions.env;
-  if (env && Object.prototype.hasOwnProperty.call(env, key)) {
-    return String(env[key]);
-  } else {
-    console.warn(`[vue-marzipano] No environment variable found with the key: ${key}`);
-    return null;
-  }
+// The URL the app is served from, from the plugin's `baseUrl` option
+function baseUrl() {
+  const base = pluginOptions.baseUrl ?? '/';
+  return new URL(base.endsWith('/') ? base : `${base}/`, window.location.origin);
+}
+
+/** Resolves an image path from the scene data to a URL; relative paths resolve from `baseUrl`. */
+export function resolveImageUrl(imagePath: string | undefined) {
+  if (!imagePath) return '';
+  return new URL(imagePath, baseUrl()).toString();
+}
+
+/** Resolves the folder that holds each scene's tile folder, without a trailing slash. */
+export function resolveTilesUrl(url: string | undefined) {
+  return new URL(url ?? 'tiles', baseUrl()).toString().replace(/\/$/, '');
+}
+
+/** Finds the component a hotspot or button `type` names: a built-in one, or one the app registered. */
+export function resolveTypeComponent(
+  type: string,
+  builtIns: Record<string, Component>,
+  kind: 'hotspot' | 'button',
+): Component | null {
+  const builtIn = builtIns[type];
+  if (builtIn) return builtIn;
+
+  const component = resolveComponent(type);
+  if (typeof component !== 'string') return component;
+
+  console.warn(
+    `[vue-marzipano] No component is registered for the ${kind} type "${type}", so it isn't shown. ` +
+      `Register one with app.component('${type}', …).`,
+  );
+  return null;
 }

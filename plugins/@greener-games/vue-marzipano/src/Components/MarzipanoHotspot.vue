@@ -1,32 +1,32 @@
 <template>
-  <div :data-hotspot-id="String(hotspotInfo.id)">
-    <component :is="hotspotType" :hotspot="hotspotInfo" />
+  <div :data-hotspot-key="hotspotKey">
+    <component :is="hotspotType" v-if="hotspotType" :hotspot="hotspotInfo" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, defineAsyncComponent, resolveComponent } from 'vue';
-  import type { Component } from 'vue';
+  import { computed } from 'vue';
   import NavigationHotspot from './Hotspots/NavigationHotspot.vue';
+  import { resolveTypeComponent } from '../helpers';
   import type { RenderedHotspot } from '../types';
 
   const props = defineProps<{
+    hotspotKey: string;
     hotspotInfo: RenderedHotspot;
   }>();
 
-  const hotspotType = computed<Component>(() => {
+  const builtIns = { NavigationHotspot };
+
+  // Link hotspots default to NavigationHotspot; info hotspots need a type the app registered
+  const hotspotType = computed(() => {
     const type = props.hotspotInfo.type;
-    if (!type) return NavigationHotspot;
-
-    const component = resolveComponent(type);
-    if (typeof component !== 'string') return component;
-
-    // Not registered globally: look for a built-in hotspot component of that name. Imported
-    // from the Hotspots subdirectory so this file can't match (and import) itself.
-    return defineAsyncComponent({
-      loader: () => import(`./Hotspots/${type}.vue`) as Promise<Component>,
-      loadingComponent: NavigationHotspot,
-      errorComponent: NavigationHotspot,
-    });
+    if (!type) {
+      console.warn(
+        `[vue-marzipano] Hotspot "${props.hotspotInfo.id}" has no type, so it isn't shown. ` +
+          'Set `type` to the name of a component you registered.',
+      );
+      return null;
+    }
+    return resolveTypeComponent(type, builtIns, 'hotspot');
   });
 </script>

@@ -6,35 +6,30 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { GetImage } from '../../helpers';
-  import { useMarzipanoContext } from '../../context';
+  import { useMarzipano } from '../../composables/useMarzipano';
+  import { resolveImageUrl } from '../../helpers';
   import type { LinkHotspot } from '../../types';
 
   const props = defineProps<{
     hotspot: LinkHotspot;
   }>();
 
-  const { data, viewFunctions } = useMarzipanoContext();
+  const { data, findSceneById, findSceneDataById, switchScene } = useMarzipano();
 
   const imageSrc = computed(() =>
-    props.hotspot.imageOverride
-      ? GetImage(props.hotspot.imageOverride)
-      : GetImage(data.icons?.defaultNavigationIcon),
+    resolveImageUrl(props.hotspot.imageOverride || data.value?.icons?.defaultNavigationIcon),
   );
 
   const label = computed(() => {
-    const target = viewFunctions.findSceneDataById(props.hotspot.target);
+    const target = findSceneDataById(props.hotspot.target);
     return target ? `Go to ${target.name}` : 'Go to scene';
   });
 
   // Switch to the selected scene
   function TriggerSceneSwitch() {
-    const scene = viewFunctions.findSceneById(props.hotspot.target);
+    const scene = findSceneById(props.hotspot.target);
     if (!scene) return;
-    viewFunctions.switchScene(
-      scene,
-      scene.data.navigationViewParameters || scene.data.initialViewParameters,
-    );
+    switchScene(scene, scene.data.navigationViewParameters || scene.data.initialViewParameters);
   }
 </script>
 

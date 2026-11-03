@@ -12,56 +12,22 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, watch } from 'vue';
-  import { GetImage } from '../../helpers';
-  import { useMarzipanoContext } from '../../context';
+  import { computed } from 'vue';
+  import { useMarzipano } from '../../composables/useMarzipano';
+  import { resolveImageUrl } from '../../helpers';
   import type { NavigationButton } from '../../types';
 
   const props = defineProps<{
     buttonData: NavigationButton;
   }>();
 
-  const imageSrcOn = computed(() => GetImage(props.buttonData.imageOn));
-  const imageSrcOff = computed(() => GetImage(props.buttonData.imageOff));
+  const imageSrcOn = computed(() => resolveImageUrl(props.buttonData.imageOn));
+  const imageSrcOff = computed(() => resolveImageUrl(props.buttonData.imageOff));
 
-  const { viewer, currentScene, enableAutoRotate, autorotateSettings } = useMarzipanoContext();
-
-  onMounted(() => {
-    Set(enableAutoRotate.value);
-  });
-
-  function Set(state: boolean) {
-    enableAutoRotate.value = state;
-    if (enableAutoRotate.value) {
-      startAutorotate();
-    } else {
-      stopAutorotate();
-    }
-  }
+  // The viewer starts and stops the rotation when this changes
+  const { enableAutoRotate } = useMarzipano();
 
   function toggle() {
-    Set(!enableAutoRotate.value);
-  }
-
-  watch(enableAutoRotate, (value) => {
-    Set(value);
-  });
-
-  watch(currentScene, () => {
-    stopAutorotate();
-    startAutorotate();
-  });
-
-  function startAutorotate() {
-    if (!enableAutoRotate.value) {
-      return;
-    }
-    viewer.value?.startMovement(autorotateSettings);
-    viewer.value?.setIdleMovement(3000, autorotateSettings);
-  }
-
-  function stopAutorotate() {
-    viewer.value?.stopMovement();
-    viewer.value?.setIdleMovement(Infinity);
+    enableAutoRotate.value = !enableAutoRotate.value;
   }
 </script>

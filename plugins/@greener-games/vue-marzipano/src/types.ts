@@ -1,10 +1,14 @@
 // ---- Scene data (the `data` prop of <MarzipanoViewer>) ----
 
-export interface CloudConfig {
-  enabled: boolean;
-  url: string;
-  /** Name of the env variable holding the query string appended to tile URLs. */
-  key: string;
+/** Where scene tiles load from. */
+export interface TileSource {
+  /** Folder holding one tile folder per scene id. Defaults to `tiles` under the plugin's `baseUrl`. */
+  url?: string;
+  /**
+   * Query string added to every tile request, e.g. a SAS token for Azure storage. It is sent to
+   * every visitor's browser, so use a read-only token scoped to the tiles.
+   */
+  query?: string;
 }
 
 export interface Level {
@@ -53,12 +57,12 @@ export interface SceneData {
   initialViewParameters: ViewParameters;
   /** View used when arriving through a navigation hotspot; defaults to `initialViewParameters`. */
   navigationViewParameters?: ViewParameters;
-  linkHotspots: LinkHotspot[];
-  infoHotspots: InfoHotspot[];
+  linkHotspots?: LinkHotspot[];
+  infoHotspots?: InfoHotspot[];
 }
 
 export interface NavigationButton {
-  /** Name of a registered component, e.g. `NavigateButton`, `FullscreenButton`, `AutoRotateButton`. */
+  /** `NavigateButton`, `FullscreenButton`, `AutoRotateButton`, or the name of a component you registered. */
   type: string;
   /** Accessible name for the button; a sensible default is derived when omitted. */
   label?: string;
@@ -71,26 +75,31 @@ export interface NavigationButton {
 }
 
 export interface MarzipanoSettings {
-  mouseViewMode: string;
-  autorotateEnabled: boolean;
-  fullscreenButton?: boolean;
-  viewControlButtons?: boolean;
-  navigationButtons: NavigationButton[];
+  /** How dragging moves the view: `drag` (the default) or `qtvr`. */
+  mouseViewMode?: string;
+  /** Start rotating the view when the viewer loads. Defaults to false. */
+  autorotateEnabled?: boolean;
+  /** Buttons shown in the control bar. */
+  navigationButtons?: NavigationButton[];
 }
 
 export interface MarzipanoData {
-  name: string;
-  cloud?: CloudConfig;
+  name?: string;
+  /** Where tiles load from. Defaults to `tiles` under the plugin's `baseUrl`. */
+  tiles?: TileSource;
   scenes: SceneData[];
-  settings: MarzipanoSettings;
+  settings?: MarzipanoSettings;
   icons?: Record<string, string>;
 }
 
 // ---- Plugin options (app.use(VueMarzipano, options)) ----
 
 export interface VueMarzipanoOptions {
-  /** The host app's env (pass `import.meta.env`), used to look up `cloud.key`. */
-  env?: Record<string, unknown>;
+  /**
+   * Where the app is served from; relative tile and image paths resolve against it. Pass
+   * `import.meta.env.BASE_URL` when the app isn't served from the site root. Defaults to `/`.
+   */
+  baseUrl?: string;
   /** Any other option is passed to the Marzipano viewer constructor. */
   [key: string]: unknown;
 }

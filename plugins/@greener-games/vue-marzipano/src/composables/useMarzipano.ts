@@ -1,23 +1,29 @@
-import { inject, ref, shallowRef, nextTick } from 'vue';
+import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import type { InjectionKey } from 'vue';
 import { Marzipano } from '../marzipano';
-import { findEnvVariableByKey, updateHotspots } from '../helpers';
-import { pluginOptions, setPluginOptions } from '../pluginOptions';
+import { resolveTilesUrl, withIds } from '../helpers';
+import { pluginOptions } from '../pluginOptions';
 import type {
   MarzipanoData,
+  MarzipanoSceneHandle,
   MarzipanoViewerHandle,
   RenderedHotspot,
   SceneData,
   ViewParameters,
   ViewerScene,
-  VueMarzipanoOptions,
 } from '../types';
 
-export type MarzipanoController = ReturnType<typeof createMarzipano>;
+/** A hotspot for the viewer to render, keyed so its element can be found and handed to Marzipano. */
+export interface PlacedHotspot {
+  key: string;
+  hotspot: RenderedHotspot;
+}
+
+export type MarzipanoController = ReturnType<typeof createMarzipano>['controls'];
 
 export const marzipanoKey: InjectionKey<MarzipanoController> = Symbol('vue-marzipano');
 
-/** Returns the controls of the nearest <MarzipanoViewer>, for components rendered inside it. */
+/** Returns the state and controls of the nearest <MarzipanoViewer>, for components inside it. */
 export function useMarzipano(): MarzipanoController {
   const controller = inject(marzipanoKey, null);
   if (!controller) {
@@ -33,75 +39,77 @@ export function useMarzipano(): MarzipanoController {
 export function createMarzipano() {
   // Each viewer gets its own state. Marzipano's own objects are held in shallow refs so Vue
   // doesn't wrap them in reactive proxies, which breaks Marzipano's identity checks.
-  const panoElement = ref<HTMLElement | null>(null);
+  const panoElement = shallowRef<HTMLElement | null>(null);
+  const data = shallowRef<MarzipanoData | null>(null);
   const viewer = shallowRef<MarzipanoViewerHandle | null>(null);
   const scenes = shallowRef<ViewerScene[]>([]);
   const currentScene = shallowRef<ViewerScene | null>(null);
-  const allHotspots = ref<RenderedHotspot[]>([]);
+  const hotspots = shallowRef<PlacedHotspot[]>([]);
   const enableAutoRotate = ref(false);
-  const autorotateSettings = Marzipano.autorotate({
+  // Bumped on every rebuild so hotspot keys change and Vue renders fresh elements for Marzipano
+  let generation = 0;
+
+  const autorotate = Marzipano.autorotate({
     yawSpeed: 0.03,
     targetPitch: 0,
     targetFov: Math.PI / 2,
   });
 
-  /**
-   * Initialize the Marzipano viewer
-   * @param element The HTML element to mount the viewer on
-   * @param data The data object containing scenes and settings
-   * @param options Optional configuration override
-   */
-  function initMarzipano(
-    element: HTMLElement,
-    data: MarzipanoData,
-    options: VueMarzipanoOptions = {},
-  ) {
-    panoElement.value = element;
-
-    // Merge global options with local options (env is for helpers, not the Marzipano viewer)
-    const { env: _env, ...config } = { ...pluginOptions, ...options };
-
-    // Initialize auto rotate setting from data if available
-    if (data.settings && data.settings.autorotateEnabled !== undefined) {
-      enableAutoRotate.value = data.settings.autorotateEnabled;
+  // Runs here rather than in AutoRotateButton, so `autorotateEnabled` works without the button
+  watch([enableAutoRotate, viewer, currentScene], ([enabled, activeViewer]) => {
+    if (!activeViewer) return;
+    activeViewer.stopMovement();
+    if (enabled) {
+      activeViewer.startMovement(autorotate);
+      activeViewer.setIdleMovement(3000, autorotate);
+    } else {
+      activeViewer.setIdleMovement(Infinity);
     }
+  });
 
-    const viewerOpts = {
+  /**
+   * Builds the Marzipano viewer for a tour, replacing any viewer already built.
+   * @param element The element to mount the viewer on
+   * @param tour The scenes and settings to show
+   */
+  function initMarzipano(element: HTMLElement, tour: MarzipanoData) {
+    destroyMarzipano();
+    generation += 1;
+    panoElement.value = element;
+    data.value = tour;
+
+    const settings = tour.settings ?? {};
+    enableAutoRotate.value = settings.autorotateEnabled ?? false;
+
+    // baseUrl is for resolving paths; every other plugin option goes to the Marzipano viewer
+    const { baseUrl: _baseUrl, ...viewerOptions } = pluginOptions;
+    const newViewer = new Marzipano.Viewer(element, {
       controls: {
-        mouseViewMode: data.settings.mouseViewMode,
+        mouseViewMode: settings.mouseViewMode ?? 'drag',
         scrollZoom: true,
       },
-      ...config, // Apply any viewer options from config
-    };
+      ...viewerOptions,
+    });
 
-    // Clean up existing viewer if it exists
-    if (viewer.value) {
-      destroyMarzipano();
-    }
+    const tilesUrl = resolveTilesUrl(tour.tiles?.url);
+    const query = tour.tiles?.query ? `?${tour.tiles.query.replace(/^\?/, '')}` : '';
+    const pending: (PlacedHotspot & { scene: MarzipanoSceneHandle })[] = [];
 
-    const newViewer = new Marzipano.Viewer(element, viewerOpts);
+    scenes.value = tour.scenes.map((source) => {
+      // A copy, so the ids and default types added here don't write back into the caller's data
+      const sceneData: SceneData = {
+        ...source,
+        linkHotspots: withIds(source.linkHotspots, `${source.id}-link`).map((hotspot) => ({
+          ...hotspot,
+          type: hotspot.type ?? 'NavigationHotspot',
+        })),
+        infoHotspots: withIds(source.infoHotspots, `${source.id}-info`),
+      };
 
-    // Reset hotspots before processing scenes
-    allHotspots.value = [];
-
-    scenes.value = data.scenes.map((sceneData: SceneData) => {
-      let urlPrefix;
-      let source;
-      if (data?.cloud?.enabled) {
-        urlPrefix = data.cloud.url;
-        const key = findEnvVariableByKey(data.cloud.key);
-        source = Marzipano.ImageUrlSource.fromString(
-          `${urlPrefix}/${sceneData.id}/{z}/{f}/{y}/{x}.jpg?${key}`,
-          { cubeMapPreviewUrl: `${urlPrefix}/${sceneData.id}/preview.jpg?${key}` },
-        );
-      } else {
-        urlPrefix = new URL('/tiles', import.meta.url.replace('/@fs', '')).toString();
-        source = Marzipano.ImageUrlSource.fromString(
-          `${urlPrefix}/${sceneData.id}/{z}/{f}/{y}/{x}.jpg`,
-          { cubeMapPreviewUrl: `${urlPrefix}/${sceneData.id}/preview.jpg` },
-        );
-      }
-
+      const tileSource = Marzipano.ImageUrlSource.fromString(
+        `${tilesUrl}/${sceneData.id}/{z}/{f}/{y}/{x}.jpg${query}`,
+        { cubeMapPreviewUrl: `${tilesUrl}/${sceneData.id}/preview.jpg${query}` },
+      );
       const geometry = new Marzipano.CubeGeometry(sceneData.levels);
       const limiter = Marzipano.RectilinearView.limit.traditional(
         Math.min(sceneData.faceSize * 8, 4096),
@@ -109,38 +117,40 @@ export function createMarzipano() {
         (120 * Math.PI) / 180,
       );
       const view = new Marzipano.RectilinearView(sceneData.initialViewParameters, limiter);
-      const createdScene = newViewer.createScene({ source, geometry, view, pinFirstLevel: true });
-
-      // Normalize hotspots IDs
-      sceneData.linkHotspots = updateHotspots(sceneData.linkHotspots);
-      sceneData.infoHotspots = updateHotspots(sceneData.infoHotspots);
-      const sceneHotspots = [
-        ...sceneData.linkHotspots,
-        ...sceneData.infoHotspots,
-      ] as RenderedHotspot[];
-
-      // Collect all hotspots for rendering in Vue (if using Vue-based hotspots)
-      allHotspots.value.push(...sceneHotspots);
-
-      void nextTick(() => {
-        sceneHotspots.forEach((x) => {
-          // Look inside this viewer only: two viewers on a page can share hotspot ids
-          const el = element.querySelector<HTMLElement>(
-            `[data-hotspot-id="${CSS.escape(String(x.id))}"]`,
-          );
-          if (el) {
-            createdScene.hotspotContainer().createHotspot(el, { yaw: x.yaw, pitch: x.pitch });
-          }
-        });
+      const scene = newViewer.createScene({
+        source: tileSource,
+        geometry,
+        view,
+        pinFirstLevel: true,
       });
 
-      return { data: sceneData, scene: createdScene, view };
+      [...(sceneData.linkHotspots ?? []), ...(sceneData.infoHotspots ?? [])].forEach(
+        (hotspot, index) => {
+          pending.push({
+            key: `${generation}-${sceneData.id}-${index}`,
+            hotspot: hotspot as RenderedHotspot,
+            scene,
+          });
+        },
+      );
+
+      return { data: sceneData, scene, view };
+    });
+
+    hotspots.value = pending.map(({ key, hotspot }) => ({ key, hotspot }));
+    // Once Vue has rendered the hotspot elements, hand each one to Marzipano to position.
+    // Look inside this viewer only: two viewers on a page render the same keys.
+    void nextTick(() => {
+      for (const { key, hotspot, scene } of pending) {
+        const el = element.querySelector<HTMLElement>(`[data-hotspot-key="${CSS.escape(key)}"]`);
+        if (el) {
+          scene.hotspotContainer().createHotspot(el, { yaw: hotspot.yaw, pitch: hotspot.pitch });
+        }
+      }
     });
 
     viewer.value = newViewer;
-    if (scenes.value.length > 0) {
-      switchScene(scenes.value[0] ?? null);
-    }
+    switchScene(scenes.value[0] ?? null);
   }
 
   function switchScene(scene: ViewerScene | null, params?: ViewParameters) {
@@ -160,17 +170,14 @@ export function createMarzipano() {
   }
 
   function destroyMarzipano() {
-    if (viewer.value) {
-      viewer.value.destroy();
-      viewer.value = null;
-    }
+    viewer.value?.destroy();
+    viewer.value = null;
     panoElement.value = null;
+    data.value = null;
     scenes.value = [];
     currentScene.value = null;
-    allHotspots.value = [];
+    hotspots.value = [];
   }
-
-  // --- Extended API ---
 
   function lookTo(yaw: number, pitch: number, fov?: number, immediate: boolean = false) {
     if (currentScene.value) {
@@ -194,21 +201,21 @@ export function createMarzipano() {
     }
   }
 
-  return {
-    panoElement,
-    viewer,
-    scenes,
-    currentScene,
-    allHotspots,
+  // What components inside the viewer (useMarzipano) and template refs get. Read-only views of
+  // the state, so only the viewer changes it; enableAutoRotate is the one you can set.
+  const controls = {
+    data: computed(() => data.value),
+    viewer: computed(() => viewer.value),
+    scenes: computed(() => scenes.value),
+    currentScene: computed(() => currentScene.value),
+    panoElement: computed(() => panoElement.value),
     enableAutoRotate,
-    autorotateSettings,
-    initMarzipano,
     switchScene,
     findSceneById,
     findSceneDataById,
-    destroyMarzipano,
     lookTo,
     setFov,
-    setPluginOptions,
   };
+
+  return { controls, hotspots, initMarzipano, destroyMarzipano };
 }

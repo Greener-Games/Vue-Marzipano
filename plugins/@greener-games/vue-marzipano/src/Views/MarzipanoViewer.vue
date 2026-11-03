@@ -1,15 +1,20 @@
 <template>
-  <div ref="panoElement" class="pano">
+  <div ref="root" class="pano">
     <slot name="titleBar">
       <TitleBar />
     </slot>
-    <MarzipanoHotspot v-for="hotspot in allHotspots" :key="hotspot.id" :hotspot-info="hotspot" />
+    <MarzipanoHotspot
+      v-for="placed in hotspots"
+      :key="placed.key"
+      :hotspot-key="placed.key"
+      :hotspot-info="placed.hotspot"
+    />
     <slot name="contentButtons">
       <div class="control-buttons">
         <div class="button-layout" style="gap: 1rem">
           <VueMarzipanoButton
-            v-for="button in navigationButtons"
-            :key="button.type + (button.imageName || '')"
+            v-for="(button, index) in navigationButtons"
+            :key="index"
             class="marzipano-button"
             :button-data="button"
           />
@@ -17,19 +22,18 @@
       </div>
     </slot>
     <slot name="scenes">
-      <SceneList @select-scene="switchScene(findSceneById($event.id))" />
+      <SceneList />
     </slot>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, provide } from 'vue';
+  import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
   import SceneList from '../Components/SceneList.vue';
   import TitleBar from '../Components/TitleBar.vue';
   import MarzipanoHotspot from '../Components/MarzipanoHotspot.vue';
   import VueMarzipanoButton from '../Components/VueMarzipanoButton.vue';
   import { createMarzipano, marzipanoKey } from '../composables/useMarzipano';
-  import { provideMarzipanoContext } from '../context';
   import type { MarzipanoData } from '../types';
 
   const props = defineProps<{
@@ -37,58 +41,23 @@
   }>();
 
   // This viewer's own state, so several viewers can share a page
-  const controller = createMarzipano();
-  const {
-    panoElement,
-    viewer,
-    scenes,
-    currentScene,
-    allHotspots,
-    enableAutoRotate,
-    autorotateSettings,
-    initMarzipano,
-    switchScene,
-    findSceneById,
-    findSceneDataById,
-    destroyMarzipano,
-    lookTo,
-    setFov,
-  } = controller;
+  const { controls, hotspots, initMarzipano, destroyMarzipano } = createMarzipano();
+  provide(marzipanoKey, controls);
+  defineExpose(controls);
 
-  provide(marzipanoKey, controller);
-  provideMarzipanoContext({
-    scenes,
-    viewer,
-    data: props.data,
-    currentScene,
-    panoElement,
-    enableAutoRotate,
-    autorotateSettings,
-    viewFunctions: { switchScene, findSceneById, findSceneDataById },
-  });
+  const root = ref<HTMLElement | null>(null);
+  const navigationButtons = computed(() => props.data.settings?.navigationButtons ?? []);
 
-  defineExpose({
-    enableAutoRotate,
-    currentScene,
-    scenes,
-    switchScene,
-    findSceneById,
-    findSceneDataById,
-    lookTo,
-    setFov,
-  });
-
-  const navigationButtons = computed(() => props.data.settings.navigationButtons);
-
-  onMounted(() => {
-    if (panoElement.value) {
-      initMarzipano(panoElement.value, props.data);
+  function load() {
+    if (root.value) {
+      initMarzipano(root.value, props.data);
     }
-  });
+  }
 
-  onUnmounted(() => {
-    destroyMarzipano();
-  });
+  onMounted(load);
+  // Rebuild when the tour changes: a new object, or a change inside a reactive one
+  watch(() => props.data, load, { deep: true });
+  onUnmounted(destroyMarzipano);
 </script>
 
 <style>

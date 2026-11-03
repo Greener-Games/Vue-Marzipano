@@ -11,17 +11,17 @@
     </button>
 
     <ul ref="listElement" class="scene-list" :class="{ open: isOpen }">
-      <li v-for="item in data.scenes" :key="item.id" :data-id="item.id">
+      <li v-for="item in scenes" :key="item.data.id" :data-id="item.data.id">
         <button
           type="button"
           class="scene cursor-pointer"
-          :class="{ current: currentScene?.data.id === item.id }"
-          :aria-current="currentScene?.data.id === item.id ? 'true' : undefined"
+          :class="{ current: currentScene === item }"
+          :aria-current="currentScene === item ? 'true' : undefined"
           @click="handleClick(item)"
         >
-          <span class="scene-text">{{ item.name }}</span>
+          <span class="scene-text">{{ item.data.name }}</span>
           <img
-            v-if="currentScene?.data.id === item.id"
+            v-if="currentScene === item"
             class="scene-icon"
             src="../assets/img/eye-regular.svg"
             alt=""
@@ -34,20 +34,22 @@
 
 <script setup lang="ts">
   import { nextTick, onMounted, ref } from 'vue';
-  import { useMarzipanoContext } from '../context';
-  import type { SceneData } from '../types';
+  import { useMarzipano } from '../composables/useMarzipano';
+  import type { SceneData, ViewerScene } from '../types';
 
   const emits = defineEmits<{
     'select-scene': [scene: SceneData];
   }>();
 
-  const { currentScene, data } = useMarzipanoContext();
+  const { scenes, currentScene, switchScene } = useMarzipano();
   const isOpen = ref(false);
   const toggleElement = ref<HTMLElement | null>(null);
   const listElement = ref<HTMLElement | null>(null);
 
-  const handleClick = (item: SceneData) => {
-    emits('select-scene', item);
+  // Switches scene itself, so the list also works when you place it in one of the viewer's slots
+  const handleClick = (item: ViewerScene) => {
+    switchScene(item);
+    emits('select-scene', item.data);
   };
 
   function toggleSceneList() {

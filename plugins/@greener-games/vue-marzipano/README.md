@@ -12,7 +12,7 @@ Vue 3 is a peer dependency. `marzipano` and `@vueuse/core` are installed with th
 
 ## Set up
 
-Register the plugin and import its stylesheet once, in `main.ts`:
+Import the stylesheet once, in `main.ts`. Registering the plugin is optional; do it to set options:
 
 ```ts
 import { createApp } from 'vue';
@@ -21,11 +21,14 @@ import VueMarzipano from '@greener-games/vue-marzipano';
 import '@greener-games/vue-marzipano/style.css';
 
 const app = createApp(App);
-app.use(VueMarzipano, { env: import.meta.env });
+app.use(VueMarzipano, { baseUrl: import.meta.env.BASE_URL });
 app.mount('#app');
 ```
 
-`env` is only needed when tiles load from the cloud (see `cloud` below). A published library can't read your app's `import.meta.env` itself, so pass it in. Any other option you pass is forwarded to the Marzipano viewer constructor.
+- **`baseUrl`**: where your app is served from. Relative tile and image paths resolve against it. You only need it when the app isn't served from the site root, e.g. on GitHub Pages under `/my-repo/`. Defaults to `/`.
+- Any other option is passed to the Marzipano viewer constructor.
+
+The plugin registers no global components, so it can't clash with yours.
 
 ## Use
 
@@ -83,17 +86,20 @@ export const tour: MarzipanoData = {
 };
 ```
 
-- **Tiles** are read from `/tiles/<scene id>/` on your site, in the layout the [Marzipano tool](https://www.marzipano.net/tool/) exports. Put them in your app's `public/tiles/`.
-- **Cloud tiles:** set `cloud: { enabled: true, url: 'https://…', key: 'VITE_TILE_SAS' }`. Tiles then load from `url`, with the value of the env variable named by `key` appended as a query string.
-- **Image paths** (`imageName`, `imageOn`, `icons…`) resolve from your site root, so `img/plus.png` means `public/img/plus.png`. Full URLs work too.
+- **Tiles** are read from `tiles/<scene id>/` under your `baseUrl`, in the layout the [Marzipano tool](https://www.marzipano.net/tool/) exports. Put them in your app's `public/tiles/`.
+- **Tiles hosted elsewhere:** set `tiles: { url: 'https://…/tiles', query: import.meta.env.VITE_TILE_SAS }`. `query` is added to every tile request. It ends up in every visitor's browser, so use a read-only token that only covers the tiles.
+- **Image paths** (`imageName`, `imageOn`, `icons…`) resolve from your `baseUrl`, so `img/plus.png` means `public/img/plus.png`. Full URLs work too.
+- **Optional fields:** `name`, `settings` and every setting in it, `tiles`, `icons`, and each scene's `linkHotspots` and `infoHotspots`. `mouseViewMode` defaults to `drag` and `autorotateEnabled` to false.
 - **Navigation buttons:** `NavigateButton` takes `zoomFactor`, `xFactor` (degrees) or `yFactor` (degrees). Every button takes an optional `label` for its accessible name; a sensible one is derived when you leave it out.
 - A link hotspot can set `imageOverride`, and a scene can set `navigationViewParameters` for the view used when you arrive through a hotspot.
+
+The viewer doesn't modify the object you pass. To show a different tour, pass a new object; changes inside a reactive object also rebuild the viewer.
 
 All of these types are exported: `MarzipanoData`, `SceneData`, `LinkHotspot`, `InfoHotspot`, `NavigationButton` and more.
 
 ## Custom hotspots and buttons
 
-A hotspot's `type`, or a button's, is the name of a globally registered component. That component receives the hotspot as its `hotspot` prop, or the button as `buttonData`, including any extra fields you add:
+Link hotspots use the built-in `NavigationHotspot` unless you set a `type`. Info hotspots always need one. A hotspot's `type`, or a button's, is the name of a built-in component or one you registered globally. That component receives the hotspot as its `hotspot` prop, or the button as `buttonData`, including any extra fields you add. A type with no matching component isn't shown, and a warning is logged. Register yours in `main.ts`:
 
 ```ts
 app.component('InfoHotspot', InfoHotspot);
@@ -106,7 +112,15 @@ app.component('InfoHotspot', InfoHotspot);
 </script>
 ```
 
-Inside the viewer, `useMarzipanoContext()` gives a custom component the viewer's state (`currentScene`, `viewer`, `data`…) and `viewFunctions.switchScene()`. `useMarzipano()` returns the viewer's full controls, including `lookTo()` and `setFov()`.
+Inside the viewer, a custom component gets the viewer's state and controls from `useMarzipano()`:
+
+```ts
+import { useMarzipano, resolveImageUrl } from '@greener-games/vue-marzipano';
+
+const { currentScene, switchScene, findSceneById, lookTo } = useMarzipano();
+```
+
+It returns read-only refs `data`, `scenes`, `currentScene`, `viewer` (the Marzipano viewer) and `panoElement`. It also returns `enableAutoRotate`, a ref you can set, and the functions `switchScene`, `findSceneById`, `findSceneDataById`, `lookTo` and `setFov`. `resolveImageUrl()` resolves an image path the way the built-in components do. The built-in components (`NavigateButton`, `SceneList`…) are exported too, so you can reuse them in the slots.
 
 ## Slots
 
@@ -129,7 +143,7 @@ Use a template ref:
 </script>
 ```
 
-The ref exposes `enableAutoRotate`, `currentScene`, `scenes`, `switchScene`, `findSceneById`, `findSceneDataById`, `lookTo` and `setFov`.
+The ref exposes the same state and controls as `useMarzipano()`.
 
 Each `<MarzipanoViewer>` keeps its own state, so you can put several on one page.
 
@@ -137,12 +151,20 @@ Each `<MarzipanoViewer>` keeps its own state, so you can put several on one page
 
 1.0.0 contains breaking changes:
 
-- **`useMarzipano()` only works inside a `<MarzipanoViewer>`.** It used to return one shared, global viewer. From outside a viewer, use a template ref (above).
+- **`useMarzipano()` only works inside a `<MarzipanoViewer>`.** It used to return one shared, global viewer. From outside a viewer, use a template ref (above). Its state refs are now read-only, apart from `enableAutoRotate`.
+- **`useMarzipanoContext()` and the string inject keys are gone** (`inject('viewer')`, `inject('data')`, `inject('marzipanoViewFunctions')`…). Use `useMarzipano()`: `viewFunctions.switchScene()` becomes `switchScene()`.
+- **`cloud` is replaced by `tiles`.** `cloud: { enabled: true, url, key: 'VITE_X' }` becomes `tiles: { url, query: import.meta.env.VITE_X }`. The plugin's `env` option is gone.
+- **Removed exports:** `createMarzipano`, `useMarzipanoContext`, `Hotspot`, `VueMarzipanoButton`, `findEnvVariableByKey`, `generateGUID` and `updateHotspots`. `GetImage` is now `resolveImageUrl`.
+- **The built-in buttons aren't registered as global components any more.** `type: 'NavigateButton'` and the rest still work in the scene data. To use one in your own template, import it.
+- **A hotspot or button whose `type` has no component** renders nothing and logs a warning. It used to fall back to a navigation arrow.
+- **Removed the `fullscreenButton` and `viewControlButtons` settings.** They had no effect.
+- **The viewer no longer writes ids into your data.** Hotspots without an `id` get `<scene id>-link-<n>` or `<scene id>-info-<n>` on the copy the viewer keeps.
 - **CSS class names are kebab-case:** `titleBar` → `title-bar`, `sceneName` → `scene-name`, `sceneList` → `scene-list`, `sceneListToggle` → `scene-list-toggle`, `navigationButton` → `navigation-button`, `autorotateToggle` → `autorotate-toggle`. Update any overrides.
-- **Image paths no longer get a `/src/` prefix on `localhost`.** Paths resolve from the site root in development and production alike, so serve images from `public/`.
-- **Pass your env to the plugin** (`app.use(VueMarzipano, { env: import.meta.env })`) if you use cloud tiles.
-- **Controls are `<button>` elements** with accessible names, so they work with a keyboard. Hotspot wrappers carry `data-hotspot-id` instead of an `id`.
+- **Image paths no longer get a `/src/` prefix on `localhost`.** Paths resolve from `baseUrl` in development and production alike, so serve images from `public/`.
+- **Controls are `<button>` elements** with accessible names, so they work with a keyboard. Hotspot wrappers carry `data-hotspot-key` instead of an `id`.
 - The title bar no longer sets `font-size` on every `h1` on the page.
+
+Also new in 1.0: `autorotateEnabled` works without an `AutoRotateButton`, the viewer rebuilds when its `data` changes, and apps served from a sub-path work via `baseUrl`.
 
 ## License
 

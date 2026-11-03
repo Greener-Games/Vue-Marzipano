@@ -12,16 +12,16 @@
 <script setup lang="ts">
   import { useFullscreen } from '@vueuse/core';
   import { computed } from 'vue';
-  import { GetImage } from '../../helpers';
-  import { useMarzipanoContext } from '../../context';
+  import { useMarzipano } from '../../composables/useMarzipano';
+  import { resolveImageUrl } from '../../helpers';
   import type { NavigationButton } from '../../types';
 
   const props = defineProps<{
     buttonData: NavigationButton;
   }>();
 
-  const { panoElement } = useMarzipanoContext();
+  const { panoElement } = useMarzipano();
   const { isFullscreen, toggle } = useFullscreen(panoElement);
 
-  const imageSrc = computed(() => GetImage(props.buttonData.imageName));
+  const imageSrc = computed(() => resolveImageUrl(props.buttonData.imageName));
 </script>

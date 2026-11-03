@@ -23,8 +23,8 @@ app.use(router);
 app.component('InfoHotspot', InfoHotspot);
 app.component('CustomImageHotspot', CustomImageHotspot);
 
-// The plugin reads cloud keys from the host app's env, so pass it in
-app.use(VueMarzipano, { env: import.meta.env });
+// Tile and image paths in the scene data resolve from where the app is served
+app.use(VueMarzipano, { baseUrl: import.meta.env.BASE_URL });
 
 app.mount('#app');
 logger.info('Application successfully mounted.');

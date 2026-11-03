@@ -11,17 +11,17 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { GetImage } from '../../helpers';
-  import { useMarzipanoContext } from '../../context';
+  import { useMarzipano } from '../../composables/useMarzipano';
+  import { resolveImageUrl } from '../../helpers';
   import type { NavigationButton } from '../../types';
 
   const props = defineProps<{
     buttonData: NavigationButton;
   }>();
 
-  const { enableAutoRotate, currentScene } = useMarzipanoContext();
+  const { enableAutoRotate, currentScene } = useMarzipano();
 
-  const imageSrc = computed(() => GetImage(props.buttonData.imageName));
+  const imageSrc = computed(() => resolveImageUrl(props.buttonData.imageName));
 
   const label = computed(() => {
     const { label, zoomFactor, xFactor, yFactor } = props.buttonData;

@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-  import { useMarzipanoContext } from '../context';
+  import { useMarzipano } from '../composables/useMarzipano';
 
-  const { currentScene } = useMarzipanoContext();
+  const { currentScene } = useMarzipano();
 </script>
 
 <style>

@@ -17,12 +17,12 @@ import VueMarzipano from '@greener-games/vue-marzipano'
 import '@greener-games/vue-marzipano/style.css'
 
 const app = createApp(App)
-app.use(VueMarzipano, { env: import.meta.env })
+app.use(VueMarzipano, { baseUrl: import.meta.env.BASE_URL })
 app.mount('#app')
 </code></pre>
       <p>
-        Passing <code>env</code> is only needed when your scene data loads tiles from the cloud: the
-        plugin reads the key named in <code>cloud.key</code> from it.
+        <code>app.use()</code> is optional. Pass <code>baseUrl</code> when your app isn't served
+        from the site root, so tile and image paths in the scene data resolve from the right folder.
       </p>
     </section>
 
@@ -38,7 +38,7 @@ app.mount('#app')
 
 &lt;script setup lang="ts"&gt;
 import { MarzipanoViewer } from '@greener-games/vue-marzipano'
-import { data as panoData } from './data.js'
+import { data as panoData } from './data'
 &lt;/script&gt;
 </code></pre>
     </section>
