@@ -13,7 +13,7 @@ This is an npm workspace, set up from the team's Vue template as a plugin projec
   - `src/composables/useMarzipano.ts`: per-viewer state and controls.
   - `src/types.ts`: the scene data format and the Marzipano API types.
 - `src/`: the demo site (Vue Router, Tailwind). It imports the plugin from source via a Vite alias, so plugin edits hot-reload.
-  - `src/views/examples/`: basic viewer, multiple viewers, custom hotspots, slot overrides, custom viewpoints.
+  - `src/views/examples/`: basic viewer, multiple viewers, custom hotspots, slot overrides, custom viewpoints, and a custom layout that replaces all of the built-in UI (components in `src/components/tour/`).
   - `src/data/`: the demo tour data.
 - `public/tiles/`: demo panorama tiles. `public/assets/img/`: demo control icons.
 

@@ -115,4 +115,13 @@
   .btn-secondary {
     @apply border-primary text-primary hover:bg-primary/10 inline-flex items-center justify-center rounded-full border bg-transparent px-6 py-3 text-base font-medium transition-all duration-200 hover:scale-105 active:scale-95;
   }
+
+  /* Controls floating over a panorama (custom layout example) */
+  .icon-btn {
+    @apply bg-bg-surface/80 text-text-main hover:bg-bg-surface focus-visible:outline-primary inline-flex size-11 cursor-pointer items-center justify-center rounded-full shadow-md backdrop-blur-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40 motion-safe:transition-colors;
+  }
+
+  .pill-btn {
+    @apply bg-bg-surface/80 text-text-main hover:bg-bg-surface focus-visible:outline-primary inline-flex max-w-[45%] cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-md backdrop-blur-md focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-colors;
+  }
 }

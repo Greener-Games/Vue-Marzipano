@@ -87,7 +87,11 @@ export const tour: MarzipanoData = {
 ```
 
 - **Tiles** are read from `tiles/<scene id>/` under your `baseUrl`, in the layout the [Marzipano tool](https://www.marzipano.net/tool/) exports. Put them in your app's `public/tiles/`.
-- **Tiles hosted elsewhere:** set `tiles: { url: 'https://…/tiles', query: import.meta.env.VITE_TILE_SAS }`. `query` is added to every tile request. It ends up in every visitor's browser, so use a read-only token that only covers the tiles.
+- **Tiles hosted elsewhere** (Azure Storage, S3, a CDN): set `tiles: { url, query }`.
+  - `url` is the folder that holds one folder per scene id, at any depth: `https://acct.blob.core.windows.net/tours/neom` loads `…/tours/neom/<scene id>/{z}/{f}/{y}/{x}.jpg`. A scene id can contain folders too (`building-a/0-lobby`).
+  - `query` is added to every tile request, e.g. `query: import.meta.env.VITE_TILE_SAS`. You can also paste a SAS URL straight into `url`, and its query string is kept.
+  - The token ends up in every visitor's browser, so use a read-only one that only covers the tiles.
+  - The host must allow cross-origin `GET` requests from your site (CORS), because the viewer draws tiles with WebGL.
 - **Image paths** (`imageName`, `imageOn`, `icons…`) resolve from your `baseUrl`, so `img/plus.png` means `public/img/plus.png`. Full URLs work too.
 - **Optional fields:** `name`, `settings` and every setting in it, `tiles`, `icons`, and each scene's `linkHotspots` and `infoHotspots`. `mouseViewMode` defaults to `drag` and `autorotateEnabled` to false.
 - **Navigation buttons:** `NavigateButton` takes `zoomFactor`, `xFactor` (degrees) or `yFactor` (degrees). Every button takes an optional `label` for its accessible name; a sensible one is derived when you leave it out.
@@ -124,7 +128,27 @@ It returns read-only refs `data`, `scenes`, `currentScene`, `viewer` (the Marzip
 
 ## Slots
 
-`<MarzipanoViewer>` has three slots to replace its built-in UI: `titleBar`, `contentButtons` (the control bar) and `scenes` (the scene list).
+There are two ways to change the controls:
+
+- **Swap single buttons.** Give an entry in `navigationButtons` the `type` of your own registered component. It receives the entry as its `buttonData` prop, extra fields included:
+
+  ```ts
+  app.component('ShareButton', ShareButton);
+  // in the scene data
+  navigationButtons: [{ type: 'ShareButton', label: 'Share', url: 'https://…' }];
+  ```
+
+- **Replace the UI completely.** `<MarzipanoViewer>` has three slots: `titleBar`, `contentButtons` (the control bar) and `scenes` (the scene list). Anything you put in a slot sits inside the viewer, so your components can call `useMarzipano()` to drive it:
+
+  ```vue
+  <MarzipanoViewer :data="tour">
+    <template #titleBar><TourHeader /></template>
+    <template #contentButtons><TourToolbar /></template>
+    <template #scenes><TourSceneMenu /></template>
+  </MarzipanoViewer>
+  ```
+
+  Slot content is laid over the panorama, so position it with `position: absolute`. The repo's [custom layout example](https://github.com/Greener-Games/Vue-Marzipano/tree/master/src/components/tour) builds a complete replacement UI this way: a header, a slide-out scene menu, a zoom/auto-rotate/fullscreen toolbar and previous/next scene buttons.
 
 ## Controlling a viewer from outside
 

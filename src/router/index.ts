@@ -10,6 +10,7 @@ const MultipleViewers = () => import('@/views/examples/MultipleViewers.vue');
 const HotspotsViewer = () => import('@/views/examples/HotspotsViewer.vue');
 const SlotOverride = () => import('@/views/examples/SlotOverride.vue');
 const CustomViewpoints = () => import('@/views/examples/CustomViewpoints.vue');
+const CustomLayout = () => import('@/views/examples/CustomLayout.vue');
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
@@ -20,6 +21,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/examples/hotspots', name: 'hotspots-viewer', component: HotspotsViewer },
   { path: '/examples/slots', name: 'slot-override', component: SlotOverride },
   { path: '/examples/viewpoints', name: 'custom-viewpoints', component: CustomViewpoints },
+  { path: '/examples/custom-layout', name: 'custom-layout', component: CustomLayout },
 ];
 
 export const router = createRouter({

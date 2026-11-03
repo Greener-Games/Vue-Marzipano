@@ -7,6 +7,7 @@
       <li><RouterLink to="/examples/hotspots">Custom Hotspots</RouterLink></li>
       <li><RouterLink to="/examples/slots">Slot Override</RouterLink></li>
       <li><RouterLink to="/examples/viewpoints">Custom Viewpoints</RouterLink></li>
+      <li><RouterLink to="/examples/custom-layout">Custom Layout</RouterLink></li>
     </ul>
   </div>
 </template>
