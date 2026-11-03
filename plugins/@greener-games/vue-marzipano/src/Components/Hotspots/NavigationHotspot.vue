@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import {computed, defineProps, inject} from "vue";
-import {GetImage} from "../helpers.ts";
+import {GetImage} from "../../helpers.ts";
 
 const props = defineProps({
   hotspot: {

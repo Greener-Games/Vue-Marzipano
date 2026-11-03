@@ -6,7 +6,7 @@ import AutoRotateButton from "./Components/AutoRotateButton.vue";
 import FullscreenButton from "./Components/FullscreenButton.vue";
 import Hotspot from "./Components/Hotspot.vue";
 import NavigateButton from "./Components/NavigateButton.vue";
-import NavigationHotspot from "./Components/NavigationHotspot.vue";
+import NavigationHotspot from "./Components/Hotspots/NavigationHotspot.vue";
 import SceneList from "./Components/SceneList.vue";
 import TitleBar from "./Components/TitleBar.vue";
 import VueMarzipanoButton from "./Components/VueMarzipanoButton.vue";

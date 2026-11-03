@@ -5,6 +5,8 @@ import Examples from '../views/Examples.vue'
 import BasicViewer from '../views/examples/BasicViewer.vue'
 import MultipleViewers from '../views/examples/MultipleViewers.vue'
 import HotspotsViewer from '../views/examples/HotspotsViewer.vue'
+import SlotOverride from '../views/examples/SlotOverride.vue'
+import CustomViewpoints from '../views/examples/CustomViewpoints.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +40,16 @@ const router = createRouter({
       path: '/examples/hotspots',
       name: 'hotspots-viewer',
       component: HotspotsViewer
+    },
+    {
+      path: '/examples/slots',
+      name: 'slot-override',
+      component: SlotOverride
+    },
+    {
+      path: '/examples/viewpoints',
+      name: 'custom-viewpoints',
+      component: CustomViewpoints
     }
   ]
 })
