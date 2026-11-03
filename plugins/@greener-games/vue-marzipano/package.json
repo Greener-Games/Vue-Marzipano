@@ -1,42 +1,62 @@
 {
   "name": "@greener-games/vue-marzipano",
+  "version": "0.0.0",
+  "description": "Vue 3 wrapper for the Marzipano 360° panorama viewer, with scenes, hotspots and controls driven by a data object",
+  "author": "",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "vue3",
+    "marzipano",
+    "360",
+    "panorama",
+    "virtual-tour"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Greener-Games/Vue-Marzipano.git",
+    "directory": "plugins/@greener-games/vue-marzipano"
+  },
+  "homepage": "https://github.com/Greener-Games/Vue-Marzipano#readme",
+  "bugs": {
+    "url": "https://github.com/Greener-Games/Vue-Marzipano/issues"
+  },
   "type": "module",
-  "private": false,
-  "version": "0.0.1",
-  "main": "dist/vue-marzipano.umd.js",
-  "module": "dist/vue-marzipano.es.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue-marzipano.es.js",
-      "require": "./dist/vue-marzipano.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
-    "./style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    }
+    "./style.css": "./dist/style.css"
   },
-  "scripts": {
-    "build": "vite build"
-  },
-  "files": [
-    "dist",
-    "package.json"
+  "sideEffects": [
+    "**/*.css"
   ],
-  "dependencies": {
-    "marzipano": "^0.10.2",
-    "sass": "^1.62.1",
-    "vue": "^3.0.0"
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "prepublishOnly": "npm run build"
   },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^4.1.0",
-    "path": "^0.12.7",
-    "typescript": "^5.0.2",
-    "vite": "^4.3.9",
-    "vite-plugin-dts": "^5.0.1",
-    "vue-tsc": "^1.4.2"
+  "dependencies": {
+    "@vueuse/core": "^10.7.2",
+    "marzipano": "^0.10.2"
   },
   "peerDependencies": {
     "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@types/node": "^25.9.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.13",
+    "vite-plugin-dts": "^4.0.0",
+    "vue": "^3.5.22"
   }
 }

@@ -1,90 +1,99 @@
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Light.woff2') format('woff2'),
-        url('Bienvenue-Light.woff') format('woff');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Light.woff2') format('woff2'),
+    url('Bienvenue-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-LightItalic.woff2') format('woff2'),
-        url('Bienvenue-LightItalic.woff') format('woff');
-    font-weight: 300;
-    font-style: italic;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-LightItalic.woff2') format('woff2'),
+    url('Bienvenue-LightItalic.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-MediumItalic.woff2') format('woff2'),
-        url('Bienvenue-MediumItalic.woff') format('woff');
-    font-weight: 500;
-    font-style: italic;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-MediumItalic.woff2') format('woff2'),
+    url('Bienvenue-MediumItalic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-BoldItalic.woff2') format('woff2'),
-        url('Bienvenue-BoldItalic.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-BoldItalic.woff2') format('woff2'),
+    url('Bienvenue-BoldItalic.woff') format('woff');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-SemiboldItalic.woff2') format('woff2'),
-        url('Bienvenue-SemiboldItalic.woff') format('woff');
-    font-weight: 600;
-    font-style: italic;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-SemiboldItalic.woff2') format('woff2'),
+    url('Bienvenue-SemiboldItalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Regular.woff2') format('woff2'),
-        url('Bienvenue-Regular.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Regular.woff2') format('woff2'),
+    url('Bienvenue-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Medium.woff2') format('woff2'),
-        url('Bienvenue-Medium.woff') format('woff');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Medium.woff2') format('woff2'),
+    url('Bienvenue-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Bold.woff2') format('woff2'),
-        url('Bienvenue-Bold.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Bold.woff2') format('woff2'),
+    url('Bienvenue-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Semibold.woff2') format('woff2'),
-        url('Bienvenue-Semibold.woff') format('woff');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Semibold.woff2') format('woff2'),
+    url('Bienvenue-Semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Bienvenue';
-    src: url('Bienvenue-Italic.woff2') format('woff2'),
-        url('Bienvenue-Italic.woff') format('woff');
-    font-weight: normal;
-    font-style: italic;
-    font-display: swap;
+  font-family: Bienvenue;
+  src:
+    url('Bienvenue-Italic.woff2') format('woff2'),
+    url('Bienvenue-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
 }
-

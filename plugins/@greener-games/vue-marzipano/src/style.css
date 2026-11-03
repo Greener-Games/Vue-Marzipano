@@ -1,0 +1,15 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.marzipano-button {
+  background-color: rgb(25 45 56 / 80%);
+  padding: 0.5rem !important;
+  border: 0;
+}
+
+.marzipano-button img {
+  width: 35px;
+  height: 35px;
+  vertical-align: middle;
+}

@@ -6,20 +6,17 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+  import type { InfoHotspot } from '@greener-games/vue-marzipano';
 
-const props = defineProps({
-  hotspot: {
-    type: Object,
-    required: true
-  }
-});
+  defineProps<{
+    hotspot: InfoHotspot;
+  }>();
 </script>
 
 <style scoped>
-.info-hotspot {
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 10px;
-  border-radius: 5px;
-}
+  .info-hotspot {
+    background-color: rgb(255 255 255 / 80%);
+    padding: 10px;
+    border-radius: 5px;
+  }
 </style>

@@ -1,49 +1,34 @@
 <template>
-  <div class="app-container">
-    <header class="app-header">
-      <nav>
-        <router-link to="/">Home</router-link> |
-        <router-link to="/docs">Documentation</router-link> |
-        <router-link to="/examples">Examples</router-link>
+  <div class="flex h-full flex-col">
+    <header class="glass sticky top-0 z-50 w-full shrink-0 border-b border-black/5">
+      <nav class="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+        <RouterLink to="/" class="text-text-main text-xl font-bold tracking-tight">
+          Vue Marzipano
+        </RouterLink>
+
+        <div class="ms-4 flex gap-4">
+          <RouterLink
+            v-for="link in links"
+            :key="link.to"
+            :to="link.to"
+            class="text-text-muted hover:text-primary font-medium transition-colors"
+            active-class="text-primary"
+          >
+            {{ link.label }}
+          </RouterLink>
+        </div>
       </nav>
     </header>
-    <main class="app-main">
-      <router-view></router-view>
+
+    <main class="relative min-h-0 flex-1 overflow-hidden">
+      <RouterView />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+  const links = [
+    { to: '/docs', label: 'Documentation' },
+    { to: '/examples', label: 'Examples' },
+  ];
 </script>
-
-<style scoped>
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-}
-
-.app-header {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-.app-main {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-</style>

@@ -1,90 +1,114 @@
 <template>
-  <div class="marzipano-button sceneListToggle cursor-pointer" @click="toggleSceneList">
-    <img v-if="isOpen" src="../assets/img/street-view-solid.svg">
-    <img v-else src="../assets/img/street-view-solid.svg">
+  <div ref="toggleElement" class="scene-list-toggle">
+    <button
+      type="button"
+      class="marzipano-button cursor-pointer"
+      :aria-expanded="isOpen"
+      aria-label="Scenes"
+      @click="toggleSceneList"
+    >
+      <img src="../assets/img/street-view-solid.svg" alt="" />
+    </button>
 
-    <ul class="sceneList" :class="{open : isOpen}">
-      <li v-for="item in data.scenes" :key="item.id" class="scene cursor-pointer"
-          :data-id="item.id"
-          :class="{current : currentScene?.data.id === item.id}" @click="handleClick(item)">
-        <div class="scene-text">{{ item.name }}</div>
-        <img v-if="currentScene?.data.id === item.id" class="scene-icon" src="../assets/img/eye-regular.svg"/>
+    <ul ref="listElement" class="scene-list" :class="{ open: isOpen }">
+      <li v-for="item in data.scenes" :key="item.id" :data-id="item.id">
+        <button
+          type="button"
+          class="scene cursor-pointer"
+          :class="{ current: currentScene?.data.id === item.id }"
+          :aria-current="currentScene?.data.id === item.id ? 'true' : undefined"
+          @click="handleClick(item)"
+        >
+          <span class="scene-text">{{ item.name }}</span>
+          <img
+            v-if="currentScene?.data.id === item.id"
+            class="scene-icon"
+            src="../assets/img/eye-regular.svg"
+            alt=""
+          />
+        </button>
       </li>
     </ul>
-
   </div>
-
 </template>
 
-<script setup>
-import {inject, nextTick, onMounted, ref} from "vue";
+<script setup lang="ts">
+  import { nextTick, onMounted, ref } from 'vue';
+  import { useMarzipanoContext } from '../context';
+  import type { SceneData } from '../types';
 
-const currentScene = inject('currentScene')
-const data = inject('data')
-const emits = defineEmits(['select-scene'])
+  const emits = defineEmits<{
+    'select-scene': [scene: SceneData];
+  }>();
 
-const isOpen = ref(false)
+  const { currentScene, data } = useMarzipanoContext();
+  const isOpen = ref(false);
+  const toggleElement = ref<HTMLElement | null>(null);
+  const listElement = ref<HTMLElement | null>(null);
 
-const handleClick = (item) => {
-  // Emit a custom event named 'custom-click' with optional payload
-  emits('select-scene', item);
-};
+  const handleClick = (item: SceneData) => {
+    emits('select-scene', item);
+  };
 
-function toggleSceneList() {
-  isOpen.value = !isOpen.value
-}
-
-const offsetPosition = ref(-500);
-onMounted(() =>
-    nextTick(() => {
-          // Calculate the offscreen position dynamically based on content size
-          const contentContainer = document.querySelector('.sceneList');
-          const computedStyle = window.getComputedStyle(document.querySelector('.sceneListToggle'));
-          offsetPosition.value = `calc(-${contentContainer.offsetWidth}px - ${computedStyle.getPropertyValue('left')} - 50px)`;
-        }
-    ))
-</script>
-
-<style scoped lang="scss">
-.sceneListToggle {
-  position: absolute;
-  bottom: 10%;
-  left: 40px;
-}
-
-.sceneList {
-  z-index: 5;
-  position: absolute;
-  bottom: 100%;
-  left: v-bind(offsetPosition); /* Default value */
-  transition: left 1s ease; /* Smooth transition when changing the left property */
-
-  padding: 0;
-  margin: 0;
-
-  &.open {
-    left: 0px; /* Ending position at 50px from the left */
+  function toggleSceneList() {
+    isOpen.value = !isOpen.value;
   }
 
-  .scene {
+  const offsetPosition = ref('-500px');
+  onMounted(() =>
+    nextTick(() => {
+      // Calculate the offscreen position dynamically based on content size
+      if (!toggleElement.value || !listElement.value) return;
+      const left = window.getComputedStyle(toggleElement.value).getPropertyValue('left');
+      offsetPosition.value = `calc(-${listElement.value.offsetWidth}px - ${left} - 50px)`;
+    }),
+  );
+</script>
+
+<style scoped>
+  .scene-list-toggle {
+    position: absolute;
+    bottom: 10%;
+    left: 40px;
+  }
+
+  .scene-list {
+    z-index: 5;
+    position: absolute;
+    bottom: 100%;
+    left: v-bind(offsetPosition); /* Default value */
+    transition: left 1s ease; /* Smooth transition when changing the left property */
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .scene-list.open {
+    left: 0; /* Ending position at 50px from the left */
+  }
+
+  .scene-list .scene {
+    width: 100%;
+    border: 0;
+    font: inherit;
+    text-align: start;
     background-color: white;
     opacity: 0.7;
     padding: 1rem;
     display: flex;
     align-items: center;
-
-    &.current {
-      opacity: 1;
-    }
-
-    .scene-text {
-      padding-right: 1rem;
-    }
-
-    .scene-icon {
-      align-self: center;
-      height: 20px;
-    }
   }
-}
+
+  .scene-list .scene.current {
+    opacity: 1;
+  }
+
+  .scene-list .scene .scene-text {
+    padding-right: 1rem;
+  }
+
+  .scene-list .scene .scene-icon {
+    align-self: center;
+    height: 20px;
+  }
 </style>

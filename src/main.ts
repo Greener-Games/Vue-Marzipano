@@ -1,20 +1,30 @@
-import {createApp} from 'vue'
-import './design/main.scss'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from '@/App.vue';
 
-import VueMarzipano from "@greener-games/vue-marzipano";
-import "@greener-games/vue-marzipano/style.css";
+import '@/assets/main.css';
 
-import InfoHotspot from "./components/InfoHotspot.vue";
-import CustomImageHotspot from "./components/CustomImageHotspot.vue";
-import router from './router'
+import router from '@/router';
+import { createPinia } from 'pinia';
+import { logger } from '@/utils/logger';
 
-const app = createApp(App)
+import VueMarzipano from '@greener-games/vue-marzipano';
+import '@greener-games/vue-marzipano/style.css';
 
-app.use(router)
+import InfoHotspot from '@/components/InfoHotspot.vue';
+import CustomImageHotspot from '@/components/CustomImageHotspot.vue';
+
+logger.info('Application initializing...');
+
+const app = createApp(App);
+app.use(createPinia());
+app.use(router);
+
+// Hotspot components referenced by `type` in the scene data
 app.component('InfoHotspot', InfoHotspot);
 app.component('CustomImageHotspot', CustomImageHotspot);
-app.use(VueMarzipano, {
-    env: import.meta.env
-});
-app.mount('#app')
+
+// The plugin reads cloud keys from the host app's env, so pass it in
+app.use(VueMarzipano, { env: import.meta.env });
+
+app.mount('#app');
+logger.info('Application successfully mounted.');

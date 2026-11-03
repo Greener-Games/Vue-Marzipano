@@ -1,16 +1,57 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import tailwindcss from '@tailwindcss/vite';
+import checker from 'vite-plugin-checker';
+import path from 'path';
+import vueDevTools from 'vite-plugin-vue-devtools';
+import csp from '@greener-games/vite-csp';
+import deterministicPort from '@greener-games/vite-deterministic-port';
+import screenSize from '@greener-games/vite-screen-size';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    {
+      ...csp({
+        policy: {
+          'default-src': ["'self'"],
+          'script-src': ["'self'"],
+          'style-src': ["'self'", "'unsafe-inline'"],
+          'img-src': ["'self'", 'data:', 'blob:'],
+          'font-src': ["'self'", 'data:'],
+          'connect-src': ["'self'"],
+        },
+      }),
+      apply: 'build',
+    },
+    checker({
+      enableBuild: false,
+      typescript: true,
+      vueTsc: true,
+      eslint: {
+        useFlatConfig: true,
+        lintCommand: 'eslint src',
+      },
+      stylelint: { lintCommand: 'stylelint "./**/*.{css,vue}"' },
+    }),
+    vueDevTools(),
+    deterministicPort(),
+    screenSize(),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@greener-games/vue-marzipano/style.css': path.resolve(__dirname, './plugins/@greener-games/vue-marzipano/src/style.scss'),
-      '@greener-games/vue-marzipano': path.resolve(__dirname, './plugins/@greener-games/vue-marzipano/src/index.ts'),
+      // Run the demo against the plugin's source, so edits hot-reload without a plugin build
+      '@greener-games/vue-marzipano/style.css': path.resolve(
+        __dirname,
+        './plugins/@greener-games/vue-marzipano/src/style.css',
+      ),
+      '@greener-games/vue-marzipano': path.resolve(
+        __dirname,
+        './plugins/@greener-games/vue-marzipano/src/index.ts',
+      ),
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
   },
-})
+});

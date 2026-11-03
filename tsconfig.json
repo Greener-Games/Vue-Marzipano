@@ -1,7 +1,21 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "plugins/**/*",
+    "plugins/**/*.vue",
+    "plugins/*/docs/.vitepress/**/*.ts",
+    "electron/**/*.ts",
+    "vite.config.ts",
+    "csp.config.ts"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@greener-games/vue-marzipano": ["./plugins/@greener-games/vue-marzipano/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "**/dist"]
 }

@@ -4,7 +4,9 @@
 
     <section>
       <h2>Installation</h2>
-      <p>Install the plugin via npm or yarn once it's published, or use it locally via workspaces.</p>
+      <p>
+        Install the plugin via npm or yarn once it's published, or use it locally via workspaces.
+      </p>
       <pre><code>npm install @greener-games/vue-marzipano</code></pre>
     </section>
 
@@ -24,7 +26,10 @@ app.mount('#app')
 
     <section>
       <h2>Basic Usage</h2>
-      <p>Use the <code>MarzipanoViewer</code> component in your templates. You need to provide a <code>data</code> prop conforming to the required structure.</p>
+      <p>
+        Use the <code>MarzipanoViewer</code> component in your templates. You need to provide a
+        <code>data</code> prop conforming to the required structure.
+      </p>
       <pre><code>&lt;template&gt;
   &lt;MarzipanoViewer :data="panoData" /&gt;
 &lt;/template&gt;
@@ -39,32 +44,32 @@ import { data as panoData } from './data.js'
 </template>
 
 <style scoped>
-.docs-view {
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: sans-serif;
-  line-height: 1.6;
-}
+  .docs-view {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: sans-serif;
+    line-height: 1.6;
+  }
 
-section {
-  margin-bottom: 2.5rem;
-}
+  section {
+    margin-bottom: 2.5rem;
+  }
 
-h2 {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
-}
+  h2 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+  }
 
-pre {
-  background: #f4f4f4;
-  padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;
-}
+  pre {
+    background: #f4f4f4;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
 
-code {
-  font-family: monospace;
-  font-size: 0.9em;
-}
+  code {
+    font-family: monospace;
+    font-size: 0.9em;
+  }
 </style>
